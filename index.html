@@ -36,7 +36,6 @@
       background: var(--bg-gradient);
       color: var(--text-main);
       overflow-x: hidden;
-      perspective: 1400px;
       padding: 24px 14px;
     }
 
@@ -46,7 +45,6 @@
 
     .app-container {
       position: relative; z-index: 10; width: 100%; max-width: 1420px; margin: 0 auto;
-      transform-style: preserve-3d; transition: transform 0.12s ease-out;
     }
 
     .main-board {
@@ -60,7 +58,7 @@
       display: flex; flex-direction: column; gap: 32px;
     }
 
-    /* Top Bar */
+    /* Top Bar Desktop */
     .top-bar {
       display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1px solid rgba(255, 255, 255, 0.8); padding-bottom: 20px;
@@ -260,11 +258,11 @@
 
     @media (max-width: 768px) {
       body {
-        padding: 8px 6px;
+        padding: 10px 8px;
         perspective: none !important;
       }
 
-      /* 3D burilishni o'chirib, kontentni mutlaqo tekis qilish */
+      /* 3D effektlarni to'liq o'chirish va yozuv ustiga chiqishni oldini olish */
       .app-container {
         transform: none !important;
         perspective: none !important;
@@ -272,35 +270,39 @@
       }
 
       .main-board {
-        padding: 16px 12px;
-        border-radius: 20px;
-        gap: 14px;
+        padding: 18px 14px;
+        border-radius: 22px;
+        gap: 16px;
         transform: none !important;
       }
 
+      /* Tepa qism - moslashuvchan, wrap funksiyasi bilan */
       .top-bar {
         display: flex;
         flex-direction: column;
         align-items: stretch;
-        gap: 12px;
-        padding-bottom: 12px;
+        gap: 14px;
+        padding-bottom: 14px;
       }
 
-      /* Logotip va tugma bitta to'g'ri qatorda */
+      /* Logotip va tugma uchun oraliq masofali (gap) flex */
       .top-bar-header {
         display: flex;
+        flex-direction: row;
+        flex-wrap: wrap; /* Ekranga sig'masa pastga tushadi */
         align-items: center;
         justify-content: space-between;
         width: 100%;
+        gap: 14px; /* Ustiga chiqib ketishni 100% to'xtatadi */
       }
 
-      .brand-title { font-size: 1.3rem; }
-      .brand-sub { font-size: 0.68rem; }
-      .brand-svg { width: 36px; height: 36px; }
+      .brand-title { font-size: 1.35rem; }
+      .brand-sub { font-size: 0.7rem; }
+      .brand-svg { width: 38px; height: 38px; }
 
-      .btn-pill-cyan {
-        padding: 8px 14px;
-        font-size: 0.8rem;
+      .top-bar-header .btn-pill-cyan {
+        padding: 8px 16px;
+        font-size: 0.85rem;
         transform: none !important;
       }
 
@@ -309,7 +311,7 @@
         width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        padding-bottom: 2px;
+        padding-bottom: 4px;
       }
       .nav-wrapper::-webkit-scrollbar { display: none; }
 
@@ -331,7 +333,7 @@
       }
 
       .main-heading {
-        font-size: 1.6rem;
+        font-size: 1.65rem;
         line-height: 1.25;
         margin-bottom: 16px;
         text-align: center;
@@ -403,6 +405,19 @@
         max-height: 90vh;
         overflow-y: auto;
         border-radius: 18px;
+      }
+    }
+
+    /* Kichik telefonlar uchun maxsus moslashuv */
+    @media (max-width: 480px) {
+      .top-bar-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .top-bar-header .btn-pill-cyan {
+        width: 100%;
+        justify-content: center;
       }
     }
   </style>
@@ -569,7 +584,7 @@
               </ul>
             </div>
           </div>
-          <!-- Admin Panel: Footer pastki qismida xodimlar uchun -->
+          <!-- Qulay va ko'zga tashlanmaydigan Admin kirish tugmasi -->
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; padding-top: 20px; flex-wrap: wrap; gap: 10px;">
             <div>&copy; 2026 Humo Med. Barcha huquqlar himoyalangan.</div>
             <a class="admin-secret-link" onclick="handleAdminClick()"><i data-lucide="lock" style="width: 13px;"></i> Xodimlar kirishi</a>
@@ -837,7 +852,6 @@
       lab_results: {}
     };
 
-    // 1. Serverdan barcha ma'lumotlarni tortib olish
     async function fetchFullDatabaseFromServer() {
       try {
         const res = await fetch(`${API_BASE_URL}/api/db?_=${Date.now()}`);
@@ -857,7 +871,6 @@
       renderAdminTables();
     }
 
-    // 2. O'zgarishlarni umumiy serverga yozish
     async function syncSectionToServer(sectionName, sectionData) {
       try {
         const res = await fetch(`${API_BASE_URL}/api/update/${sectionName}`, {
@@ -873,7 +886,6 @@
       }
     }
 
-    // 3. Online Tahlil Tekshirish
     async function executeLabCheck(customInputId = null) {
       let inputElem = null;
       if (customInputId) {
@@ -1164,7 +1176,6 @@
       }
     }
 
-    // 5. Interfeysni Chizish (Frontend)
     function renderFrontend() {
       const sContainer = document.getElementById('servicesFrontendList');
       const allServicesFull = document.getElementById('allServicesFullList');
@@ -1279,7 +1290,6 @@
       lucide.createIcons();
     }
 
-    // 6. Kalendar va boshqaruv funksiyalari
     let currentCalDate = new Date();
     let selectedBookingDate = new Date();
     let selectedBookingTime = '09:00';
@@ -1439,18 +1449,7 @@
       document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
     }
 
-    // 7. 3D Background & Tilt (Faqat kompyuter uchun, mobilda o'chirilgan)
-    const board = document.getElementById('boardContainer');
-    window.addEventListener('mousemove', (e) => {
-      if (window.innerWidth <= 768) return;
-      const x = (window.innerWidth / 2 - e.clientX) / 60;
-      const y = (window.innerHeight / 2 - e.clientY) / 60;
-      board.style.transform = `rotateY(${-x}deg) rotateX(${y}deg)`;
-    });
-    window.addEventListener('mouseleave', () => {
-      board.style.transform = `rotateY(0deg) rotateX(0deg)`;
-    });
-
+    // 7. 3D Background - Mutlaqo tekis (tilt o'chirilgan)
     const canvas = document.getElementById('bgCanvas');
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
