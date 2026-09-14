@@ -6,10 +6,10 @@ import aiohttp_cors
 from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters import Command
 
-# Telegram Bot tokeningizni yozing
-BOT_TOKEN = "7283268717:AAH6F9JJdwJq54COIRZqraaX-vHR07tehEU" # O'zingizning haqiqiy tokeningizni qoldiring
+# Telegram Bot tokeni
+BOT_TOKEN = "7283268717:AAH6F9JJdwJq54COIRZqraaX-vHR07tehEU"
 
-bot = Bot(token=BOT_TOKEN) if BOT_TOKEN and "..." not in BOT_TOKEN else None
+bot = Bot(token=BOT_TOKEN) if BOT_TOKEN else None
 dp = Dispatcher()
 
 DATA_FILE = "humomed_db.json"
@@ -47,7 +47,16 @@ def load_db():
         return DEFAULT_DB
     try:
         with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            # lab_results massiv bo'lib qolgan bo'lsa, lug'atga aylantiramiz
+            if isinstance(data.get("lab_results"), list):
+                new_labs = {}
+                for item in data["lab_results"]:
+                    code = item.get("code", "").replace(" ", "").upper()
+                    if code:
+                        new_labs[code] = item
+                data["lab_results"] = new_labs
+            return data
     except Exception:
         return DEFAULT_DB
 
@@ -84,16 +93,20 @@ async def handle_file_lab(message: types.Message):
 
 async def parse_and_store(raw_text: str, message: types.Message, file_url=""):
     if "|" not in raw_text:
-        await message.reply("⚠️ Format noto‘g‘ri! Elementlarni <b>|</b> bilan ajrating.")
+        await message.reply("⚠️ Format noto‘g‘ri! Elementlarni <b>|</b> bilan ajrating:\n<code>HM-0077 | Ism | Turi | Vrach | Xulosa</code>")
         return
+    
     parts = [p.strip() for p in raw_text.split("|")]
-    code = parts[0].upper()
+    code = parts[0].replace(" ", "").upper()
     patient = parts[1] if len(parts) > 1 else "Bemor"
     test_type = parts[2] if len(parts) > 2 else "Umumiy tahlil"
     doctor = parts[3] if len(parts) > 3 else "Humo Med Shifokori"
     summary = parts[4] if len(parts) > 4 else "Tahlil natijalari tayyor."
 
     db = load_db()
+    if "lab_results" not in db or not isinstance(db["lab_results"], dict):
+        db["lab_results"] = {}
+
     db["lab_results"][code] = {
         "id": int(asyncio.get_event_loop().time() * 1000),
         "code": code,
@@ -105,21 +118,46 @@ async def parse_and_store(raw_text: str, message: types.Message, file_url=""):
         "fileUrl": file_url
     }
     save_db(db)
-    await message.reply(f"✅ <b>Muvaffaqiyatli saqlandi!</b>\n🔑 Kod: <code>{code}</code>\n👤 Bemor: {patient}\n🌐 Saytda darhol ko‘rinadi!")
+    await message.reply(
+        f"✅ <b>Muvaffaqiyatli saqlandi!</b>\n"
+        f"🔑 Kod: <code>{code}</code>\n"
+        f"👤 Bemor: {patient}\n"
+        f"🌐 Saytda darhol tekshirish mumkin!"
+    )
 
 # ================= REST API HANDLERS =================
+CACHE_HEADERS = {
+    "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+    "Pragma": "no-cache",
+    "Expires": "0"
+}
+
 async def api_health(request):
-    return web.Response(text="Humo Med API Live OK!")
+    return web.Response(text="Humo Med API Live OK!", headers=CACHE_HEADERS)
 
 async def api_get_full_db(request):
-    return web.json_response(load_db())
+    db = load_db()
+    return web.json_response(db, headers=CACHE_HEADERS)
 
 async def api_get_lab_by_code(request):
-    code = request.match_info.get('code', '').upper()
+    raw_code = request.match_info.get('code', '')
+    clean_code = raw_code.replace(" ", "").replace("%20", "").upper()
+    
     db = load_db()
-    if code in db.get("lab_results", {}):
-        return web.json_response({"status": "success", "data": db["lab_results"][code]})
-    return web.json_response({"status": "not_found"}, status=404)
+    labs = db.get("lab_results", {})
+
+    # 1. To'g'ridan-to'g'ri kalit orqali qidirish
+    if isinstance(labs, dict) and clean_code in labs:
+        return web.json_response({"status": "success", "data": labs[clean_code]}, headers=CACHE_HEADERS)
+
+    # 2. Ichidagi 'code' maydoni bo'yicha qidirish
+    for k, item in (labs.items() if isinstance(labs, dict) else enumerate(labs)):
+        if isinstance(item, dict):
+            item_code = item.get("code", "").replace(" ", "").upper()
+            if item_code == clean_code:
+                return web.json_response({"status": "success", "data": item}, headers=CACHE_HEADERS)
+
+    return web.json_response({"status": "not_found", "message": "Tahlil topilmadi"}, status=404, headers=CACHE_HEADERS)
 
 async def api_update_section(request):
     sec = request.match_info.get('section', '')
@@ -128,16 +166,18 @@ async def api_update_section(request):
         db = load_db()
         db[sec] = body
         save_db(db)
-        return web.json_response({"status": "success"})
+        return web.json_response({"status": "success"}, headers=CACHE_HEADERS)
     except Exception as e:
-        return web.json_response({"status": "error", "message": str(e)}, status=500)
+        return web.json_response({"status": "error", "message": str(e)}, status=500, headers=CACHE_HEADERS)
 
 # ================= ASOSIY RUNNER =================
 async def start_server():
     app = web.Application()
     cors = aiohttp_cors.setup(app, defaults={
         "*": aiohttp_cors.ResourceOptions(
-            allow_credentials=True, expose_headers="*", allow_headers="*"
+            allow_credentials=True, 
+            expose_headers="*", 
+            allow_headers="*"
         )
     })
 
@@ -155,6 +195,7 @@ async def start_server():
     print(f"🚀 API Server 0.0.0.0:{port} portida ishga tushdi")
 
     if bot:
+        print("🤖 Telegram Bot polling boshlandi...")
         asyncio.create_task(dp.start_polling(bot))
 
     while True:
