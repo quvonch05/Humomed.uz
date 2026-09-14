@@ -1,18 +1,19 @@
 import os
 import json
 import asyncio
+import re
 from aiohttp import web
 import aiohttp_cors
 from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters import Command
+import asyncpg
 
-# Telegram Bot tokeni
 BOT_TOKEN = "7283268717:AAH6F9JJdwJq54COIRZqraaX-vHR07tehEU"
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 bot = Bot(token=BOT_TOKEN) if BOT_TOKEN else None
 dp = Dispatcher()
-
-DATA_FILE = "humomed_db.json"
+db_pool = None
 
 DEFAULT_DB = {
     "services": [
@@ -40,31 +41,50 @@ DEFAULT_DB = {
     }
 }
 
-def load_db():
-    if not os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "w", encoding="utf-8") as f:
-            json.dump(DEFAULT_DB, f, ensure_ascii=False, indent=2)
-        return DEFAULT_DB
-    try:
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            # lab_results massiv bo'lib qolgan bo'lsa, lug'atga aylantiramiz
-            if isinstance(data.get("lab_results"), list):
-                new_labs = {}
-                for item in data["lab_results"]:
-                    code = item.get("code", "").replace(" ", "").upper()
-                    if code:
-                        new_labs[code] = item
-                data["lab_results"] = new_labs
-            return data
-    except Exception:
-        return DEFAULT_DB
+# ================= POSTGRESQL FUNKSIYALARI =================
+async def init_db():
+    global db_pool
+    if not DATABASE_URL:
+        print("⚠️ DATABASE_URL topilmadi, mahalliy rejimda ishlaydi.")
+        return
 
-def save_db(data):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    # Render URL'dagi postgres:// ni postgresql:// ga o'tkazish
+    pg_url = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    db_pool = await asyncpg.create_pool(pg_url)
 
-# ================= TELEGRAM BOT LOGIKASI =================
+    async with db_pool.acquire() as conn:
+        await conn.execute('''
+            CREATE TABLE IF NOT EXISTS portal_store (
+                id INT PRIMARY KEY,
+                data JSONB NOT NULL
+            );
+        ''')
+        row = await conn.fetchrow('SELECT data FROM portal_store WHERE id = 1;')
+        if not row:
+            await conn.execute(
+                'INSERT INTO portal_store (id, data) VALUES (1, $1);',
+                json.dumps(DEFAULT_DB)
+            )
+            print("✅ PostgreSQL: Dastlabki ma'lumotlar bazaga kiritildi.")
+
+async def get_db_data():
+    if db_pool:
+        async with db_pool.acquire() as conn:
+            row = await conn.fetchrow('SELECT data FROM portal_store WHERE id = 1;')
+            if row:
+                data = row['data']
+                return json.loads(data) if isinstance(data, str) else data
+    return DEFAULT_DB
+
+async def save_db_data(data):
+    if db_pool:
+        async with db_pool.acquire() as conn:
+            await conn.execute(
+                'UPDATE portal_store SET data = $1 WHERE id = 1;',
+                json.dumps(data)
+            )
+
+# ================= TELEGRAM BOT =================
 @dp.message(Command("start"))
 async def start_handler(message: types.Message):
     await message.answer(
@@ -72,8 +92,7 @@ async def start_handler(message: types.Message):
         "Bemor tahlil natijasini saytga chiqarish uchun quyidagi formatda yuboring:\n"
         "<code>KOD | Bemor Ismi | Tahlil Turi | Vrach Ismi | Xulosa</code>\n\n"
         "<i>Misol:</i>\n"
-        "<code>HM-0077 | Sardor Aliyev | Biokimyo | Dr. Jasur | Natijalar me'yorda</code>\n\n"
-        "📎 PDF yoki rasm yuborayotganda izoh (caption) qismiga shu formatda yozing!"
+        "<code>HM-0077 | Sardor Aliyev | Biokimyo | Dr. Jasur | Natijalar me'yorda</code>"
     )
 
 @dp.message(F.text)
@@ -92,18 +111,19 @@ async def handle_file_lab(message: types.Message):
     await parse_and_store(caption, message, file_url=file_url)
 
 async def parse_and_store(raw_text: str, message: types.Message, file_url=""):
-    if "|" not in raw_text:
-        await message.reply("⚠️ Format noto‘g‘ri! Elementlarni <b>|</b> bilan ajrating:\n<code>HM-0077 | Ism | Turi | Vrach | Xulosa</code>")
+    clean_text = re.sub(r'<[^>]*>', '', raw_text).strip()
+    if "|" not in clean_text:
+        await message.reply("⚠️ Format noto‘g‘ri! Elementlarni | bilan ajrating.")
         return
     
-    parts = [p.strip() for p in raw_text.split("|")]
+    parts = [p.strip() for p in clean_text.split("|")]
     code = parts[0].replace(" ", "").upper()
     patient = parts[1] if len(parts) > 1 else "Bemor"
     test_type = parts[2] if len(parts) > 2 else "Umumiy tahlil"
     doctor = parts[3] if len(parts) > 3 else "Humo Med Shifokori"
     summary = parts[4] if len(parts) > 4 else "Tahlil natijalari tayyor."
 
-    db = load_db()
+    db = await get_db_data()
     if "lab_results" not in db or not isinstance(db["lab_results"], dict):
         db["lab_results"] = {}
 
@@ -117,15 +137,15 @@ async def parse_and_store(raw_text: str, message: types.Message, file_url=""):
         "summary": summary,
         "fileUrl": file_url
     }
-    save_db(db)
+    await save_db_data(db)
     await message.reply(
         f"✅ <b>Muvaffaqiyatli saqlandi!</b>\n"
         f"🔑 Kod: <code>{code}</code>\n"
         f"👤 Bemor: {patient}\n"
-        f"🌐 Saytda darhol tekshirish mumkin!"
+        f"🌐 Baza doimiy PostgreSQL xotirasiga yozildi!"
     )
 
-# ================= REST API HANDLERS =================
+# ================= REST API =================
 CACHE_HEADERS = {
     "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
     "Pragma": "no-cache",
@@ -133,24 +153,22 @@ CACHE_HEADERS = {
 }
 
 async def api_health(request):
-    return web.Response(text="Humo Med API Live OK!", headers=CACHE_HEADERS)
+    return web.Response(text="Humo Med PostgreSQL Live OK!", headers=CACHE_HEADERS)
 
 async def api_get_full_db(request):
-    db = load_db()
+    db = await get_db_data()
     return web.json_response(db, headers=CACHE_HEADERS)
 
 async def api_get_lab_by_code(request):
     raw_code = request.match_info.get('code', '')
     clean_code = raw_code.replace(" ", "").replace("%20", "").upper()
     
-    db = load_db()
+    db = await get_db_data()
     labs = db.get("lab_results", {})
 
-    # 1. To'g'ridan-to'g'ri kalit orqali qidirish
     if isinstance(labs, dict) and clean_code in labs:
         return web.json_response({"status": "success", "data": labs[clean_code]}, headers=CACHE_HEADERS)
 
-    # 2. Ichidagi 'code' maydoni bo'yicha qidirish
     for k, item in (labs.items() if isinstance(labs, dict) else enumerate(labs)):
         if isinstance(item, dict):
             item_code = item.get("code", "").replace(" ", "").upper()
@@ -163,15 +181,17 @@ async def api_update_section(request):
     sec = request.match_info.get('section', '')
     try:
         body = await request.json()
-        db = load_db()
+        db = await get_db_data()
         db[sec] = body
-        save_db(db)
+        await save_db_data(db)
         return web.json_response({"status": "success"}, headers=CACHE_HEADERS)
     except Exception as e:
         return web.json_response({"status": "error", "message": str(e)}, status=500, headers=CACHE_HEADERS)
 
-# ================= ASOSIY RUNNER =================
+# ================= SERVER START =================
 async def start_server():
+    await init_db()
+
     app = web.Application()
     cors = aiohttp_cors.setup(app, defaults={
         "*": aiohttp_cors.ResourceOptions(
@@ -192,10 +212,9 @@ async def start_server():
     port = int(os.environ.get("PORT", 10000))
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
-    print(f"🚀 API Server 0.0.0.0:{port} portida ishga tushdi")
+    print(f"🚀 Server 0.0.0.0:{port} portida ishlamoqda")
 
     if bot:
-        print("🤖 Telegram Bot polling boshlandi...")
         asyncio.create_task(dp.start_polling(bot))
 
     while True:
