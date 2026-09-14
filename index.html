@@ -1418,6 +1418,83 @@
 
     renderFullCalendar();
     fetchFullDatabaseFromServer();
+    async function executeLabCheck(customInputId = null) {
+      let inputElem = null;
+      if (customInputId) {
+        inputElem = document.getElementById(customInputId);
+      } else {
+        inputElem = document.getElementById('directLabInput') || document.getElementById('fullViewLabInput');
+      }
+
+      if (!inputElem || !inputElem.value.trim()) {
+        showInfoModal("Eslatma", "Iltimos, tahlil chekingizdagi kodni kiriting (Masalan: HM-0077)");
+        return;
+      }
+
+      // Probellar va tirelarni tozalab olish
+      const searchCode = inputElem.value.trim().toUpperCase().replace(/\s+/g, '');
+
+      showInfoModal("Qidirilmoqda 🔍", `<p style="color:#64748b;">Markaziy serverdan <b>${searchCode}</b> tahlili tekshirilmoqda...</p>`);
+
+      try {
+        // 1. To'g'ridan-to'g'ri Render API'ga keshni chetlab o'tuvchi so'rov (?t=...)
+        const res = await fetch(`${API_BASE_URL}/api/results/${encodeURIComponent(searchCode)}?t=${Date.now()}`, {
+          cache: "no-store",
+          headers: { "Cache-Control": "no-cache" }
+        });
+
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.data) {
+            displayLabResultModal(json.data);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("Alohida qidiruvda xatolik:", err);
+      }
+
+      // 2. Agar alohida topilmasa, to'liq DBni ham keshsiz tortib olish
+      try {
+        const fullRes = await fetch(`${API_BASE_URL}/api/db?t=${Date.now()}`, {
+          cache: "no-store",
+          headers: { "Cache-Control": "no-cache" }
+        });
+        if (fullRes.ok) {
+          DB = await fullRes.json();
+          localStorage.setItem("humomed_full_db", JSON.stringify(DB));
+
+          const labs = DB.lab_results || {};
+
+          // To'g'ridan-to'g'ri kalit orqali qidirish
+          if (labs[searchCode]) {
+            displayLabResultModal(labs[searchCode]);
+            return;
+          }
+
+          // Ro'yxat aylanib ichidan qidirish
+          const found = Object.values(labs).find(item => 
+            item && item.code && item.code.replace(/\s+/g, '').toUpperCase() === searchCode
+          );
+
+          if (found) {
+            displayLabResultModal(found);
+            return;
+          }
+        }
+      } catch (e) {
+        console.error("Bazani yuklashda xatolik:", e);
+      }
+
+      // 3. Agar umuman topilmasa
+      showInfoModal(
+        "Tahlil Topilmadi 🔍",
+        `<div style="color:#b91c1c; font-weight:700; margin-bottom:8px;">«${searchCode}» raqamli tahlil topilmadi!</div>
+         <p style="font-size:0.85rem; color:#64748b;">
+           Telegram bot orqali kiritilgan kod to‘g‘riligini tekshiring yoki shifokor bilan bog‘laning.
+         </p>`
+      );
+    }
   </script>
 </body>
 </html>
