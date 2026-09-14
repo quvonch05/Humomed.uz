@@ -776,7 +776,7 @@
     // 1. Serverdan barcha ma'lumotlarni tortib olish
     async function fetchFullDatabaseFromServer() {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/db`);
+        const res = await fetch(`${API_BASE_URL}/api/db?_=${Date.now()}`);
         if (res.ok) {
           DB = await res.json();
           localStorage.setItem("humomed_full_db", JSON.stringify(DB));
@@ -793,7 +793,7 @@
       renderAdminTables();
     }
 
-    // 2. O'zgarishlarni barcha qurilmalar uchun umumiy serverga yozish
+    // 2. O'zgarishlarni umumiy serverga yozish
     async function syncSectionToServer(sectionName, sectionData) {
       try {
         const res = await fetch(`${API_BASE_URL}/api/update/${sectionName}`, {
@@ -809,7 +809,7 @@
       }
     }
 
-    // 3. Online Tahlil Tekshirish (Telegram Botdan kelgan natijalar uchun to'g'irlangan qidiruv)
+    // 3. Online Tahlil Tekshirish (Telegram botdan kelgan natijalar uchun to'liq to'g'irlangan qidiruv)
     async function executeLabCheck(customInputId = null) {
       let inputElem = null;
       if (customInputId) {
@@ -823,18 +823,16 @@
         return;
       }
 
-      // Probellarni va keraksiz belgilarni tozalash
       const searchCode = inputElem.value.trim().toUpperCase().replace(/\s+/g, '');
-
       showInfoModal("Qidirilmoqda 🔍", `<p style="color:#64748b;">Markaziy serverdan <b>${searchCode}</b> tahlili yuklanmoqda...</p>`);
 
+      // 1-bosqich: To'g'ridan-to'g'ri API endpoint orqali tekshirish
       try {
-        // 1. To'g'ridan-to'g'ri Render API'ga murojaat
-        const res = await fetch(`${API_BASE_URL}/api/results/${searchCode}`);
+        const res = await fetch(`${API_BASE_URL}/api/results/${encodeURIComponent(searchCode)}?_=${Date.now()}`);
         if (res.ok) {
           const json = await res.json();
           if (json && json.data) {
-            displayLabResultModal(json.data);
+            renderFoundLab(json.data);
             return;
           }
         }
@@ -842,15 +840,28 @@
         console.warn("Alohida qidiruvda xatolik:", err);
       }
 
-      // 2. Agar alohida topilmasa, butun DBni yangilab tekshirish
+      // 2-bosqich: To'liq DB orqali qidirish
       try {
-        const fullRes = await fetch(`${API_BASE_URL}/api/db`);
+        const fullRes = await fetch(`${API_BASE_URL}/api/db?_=${Date.now()}`);
         if (fullRes.ok) {
-          DB = await fullRes.json();
+          const liveDB = await fullRes.json();
+          DB = liveDB;
           localStorage.setItem("humomed_full_db", JSON.stringify(DB));
-          
-          if (DB.lab_results && DB.lab_results[searchCode]) {
-            displayLabResultModal(DB.lab_results[searchCode]);
+
+          const labs = liveDB.lab_results || {};
+
+          if (labs[searchCode]) {
+            renderFoundLab(labs[searchCode]);
+            return;
+          }
+
+          const allLabsArray = Array.isArray(labs) ? labs : Object.values(labs);
+          const found = allLabsArray.find(item => 
+            item && item.code && item.code.replace(/\s+/g, '').toUpperCase() === searchCode
+          );
+
+          if (found) {
+            renderFoundLab(found);
             return;
           }
         }
@@ -858,13 +869,14 @@
         console.error("Bazani yuklashda xatolik:", e);
       }
 
-      // 3. Mahalliy keshdan tekshirish
-      if (DB.lab_results && DB.lab_results[searchCode]) {
-        displayLabResultModal(DB.lab_results[searchCode]);
+      // 3-bosqich: Mahalliy keshdan tekshirish
+      const localLabs = DB.lab_results || {};
+      if (localLabs[searchCode]) {
+        renderFoundLab(localLabs[searchCode]);
         return;
       }
 
-      // 4. Serverda ham, keshda ham topilmasa
+      // 4-bosqich: Topilmasa
       showInfoModal(
         "Tahlil Topilmadi 🔍",
         `<div style="color:#b91c1c; font-weight:700; margin-bottom:8px;">«${searchCode}» raqamli tahlil topilmadi!</div>
@@ -874,22 +886,32 @@
       );
     }
 
-    function displayLabResultModal(found) {
-      let fileBtn = found.fileUrl 
-        ? `<a href="${found.fileUrl}" target="_blank" class="btn-pill btn-pill-cyan" style="width:100%; justify-content:center; margin-top:14px; text-decoration:none;">📥 Faylni Ochish (PDF/Rasm)</a>`
-        : `<button class="btn-pill btn-pill-cyan" style="width:100%; justify-content:center; margin-top:14px;" onclick="alert('Elektron sertifikat tayyorlanmoqda...')">📥 Elektron Sertifikatni Yuklab Olish (PDF)</button>`;
+    // Topilgan tahlilni oynada chiroyli ko'rsatish
+    function renderFoundLab(data) {
+      let fileBtn = "";
+      if (data.fileUrl) {
+        fileBtn = `
+          <a href="${data.fileUrl}" target="_blank" class="btn-pill btn-pill-cyan" style="display:flex; justify-content:center; align-items:center; width:100%; margin-top:14px; text-decoration:none; padding:10px; border-radius:12px; font-weight:700;">
+            📥 Shifokor Yuklagan Faylni Ochish (PDF/Rasm)
+          </a>
+        `;
+      }
 
       showInfoModal(
-        `Tahlil Natijasi: ${found.code} ✅`,
-        `<div style="background:#f0fdf4; border:1px solid #86efac; border-radius:14px; padding:16px; color:#166534; font-size:0.88rem;">
-          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Bemor:</strong> <span>${found.patient}</span></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Tahlil turi:</strong> <span>${found.testType}</span></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Shifokor:</strong> <span>${found.doctor}</span></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Sana:</strong> <span>${found.date}</span></div>
+        `Tahlil Natijasi: ${data.code} ✅`,
+        `
+        <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:14px; padding:16px; color:#166534; font-size:0.88rem; line-height: 1.6;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Bemor:</strong> <span>${data.patient || 'Ko‘rsatilmagan'}</span></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Tahlil turi:</strong> <span>${data.testType || 'Umumiy'}</span></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Shifokor:</strong> <span>${data.doctor || 'Shifokor'}</span></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Sana:</strong> <span>${data.date || 'Bugun'}</span></div>
           <div style="margin-top:10px; padding-top:8px; border-top:1px dashed #86efac;">
-            <strong>Tibbiy Xulosa:</strong><p style="margin-top:4px; color:#14532d;">${found.summary}</p>
+            <strong>Tibbiy Xulosa:</strong>
+            <p style="margin-top:4px; color:#14532d;">${data.summary || 'Natijalar tayyor.'}</p>
           </div>
-        </div>${fileBtn}`
+        </div>
+        ${fileBtn}
+        `
       );
     }
 
@@ -906,7 +928,7 @@
     }
 
     async function saveLabResult() {
-      const code = document.getElementById('labCodeInputModal').value.trim().toUpperCase();
+      const code = document.getElementById('labCodeInputModal').value.trim().toUpperCase().replace(/\s+/g, '');
       const patient = document.getElementById('labPatientModal').value.trim();
       const testType = document.getElementById('labTypeModal').value.trim();
       const doctor = document.getElementById('labDoctorModal').value.trim();
@@ -918,7 +940,7 @@
         return;
       }
 
-      if (!DB.lab_results) DB.lab_results = {};
+      if (!DB.lab_results || Array.isArray(DB.lab_results)) DB.lab_results = {};
       DB.lab_results[code] = {
         id: Date.now(),
         code, patient, testType, doctor,
@@ -1143,7 +1165,8 @@
       const labTbody = document.getElementById('adminLabTable');
       if (labTbody) {
         labTbody.innerHTML = '';
-        const labs = Object.values(DB.lab_results || {});
+        const rawLabs = DB.lab_results || {};
+        const labs = Array.isArray(rawLabs) ? rawLabs : Object.values(rawLabs);
         labs.forEach(l => {
           const tr = document.createElement('tr');
           tr.innerHTML = `
@@ -1357,7 +1380,7 @@
       document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
     }
 
-    // 7. 3D Background & Tilt (Faqat kompyuterlar uchun)
+    // 7. 3D Background & Tilt
     const board = document.getElementById('boardContainer');
     window.addEventListener('mousemove', (e) => {
       if (window.innerWidth <= 768) return;
@@ -1418,83 +1441,6 @@
 
     renderFullCalendar();
     fetchFullDatabaseFromServer();
-    async function executeLabCheck(customInputId = null) {
-      let inputElem = null;
-      if (customInputId) {
-        inputElem = document.getElementById(customInputId);
-      } else {
-        inputElem = document.getElementById('directLabInput') || document.getElementById('fullViewLabInput');
-      }
-
-      if (!inputElem || !inputElem.value.trim()) {
-        showInfoModal("Eslatma", "Iltimos, tahlil chekingizdagi kodni kiriting (Masalan: HM-0077)");
-        return;
-      }
-
-      // Probellar va tirelarni tozalab olish
-      const searchCode = inputElem.value.trim().toUpperCase().replace(/\s+/g, '');
-
-      showInfoModal("Qidirilmoqda 🔍", `<p style="color:#64748b;">Markaziy serverdan <b>${searchCode}</b> tahlili tekshirilmoqda...</p>`);
-
-      try {
-        // 1. To'g'ridan-to'g'ri Render API'ga keshni chetlab o'tuvchi so'rov (?t=...)
-        const res = await fetch(`${API_BASE_URL}/api/results/${encodeURIComponent(searchCode)}?t=${Date.now()}`, {
-          cache: "no-store",
-          headers: { "Cache-Control": "no-cache" }
-        });
-
-        if (res.ok) {
-          const json = await res.json();
-          if (json && json.data) {
-            displayLabResultModal(json.data);
-            return;
-          }
-        }
-      } catch (err) {
-        console.warn("Alohida qidiruvda xatolik:", err);
-      }
-
-      // 2. Agar alohida topilmasa, to'liq DBni ham keshsiz tortib olish
-      try {
-        const fullRes = await fetch(`${API_BASE_URL}/api/db?t=${Date.now()}`, {
-          cache: "no-store",
-          headers: { "Cache-Control": "no-cache" }
-        });
-        if (fullRes.ok) {
-          DB = await fullRes.json();
-          localStorage.setItem("humomed_full_db", JSON.stringify(DB));
-
-          const labs = DB.lab_results || {};
-
-          // To'g'ridan-to'g'ri kalit orqali qidirish
-          if (labs[searchCode]) {
-            displayLabResultModal(labs[searchCode]);
-            return;
-          }
-
-          // Ro'yxat aylanib ichidan qidirish
-          const found = Object.values(labs).find(item => 
-            item && item.code && item.code.replace(/\s+/g, '').toUpperCase() === searchCode
-          );
-
-          if (found) {
-            displayLabResultModal(found);
-            return;
-          }
-        }
-      } catch (e) {
-        console.error("Bazani yuklashda xatolik:", e);
-      }
-
-      // 3. Agar umuman topilmasa
-      showInfoModal(
-        "Tahlil Topilmadi 🔍",
-        `<div style="color:#b91c1c; font-weight:700; margin-bottom:8px;">«${searchCode}» raqamli tahlil topilmadi!</div>
-         <p style="font-size:0.85rem; color:#64748b;">
-           Telegram bot orqali kiritilgan kod to‘g‘riligini tekshiring yoki shifokor bilan bog‘laning.
-         </p>`
-      );
-    }
   </script>
 </body>
 </html>
