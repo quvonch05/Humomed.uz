@@ -63,14 +63,15 @@
     .top-bar {
       display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1px solid rgba(255, 255, 255, 0.8); padding-bottom: 20px;
+      gap: 16px;
     }
 
-    .brand-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
+    .brand-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; flex-shrink: 0; }
     .brand-svg { width: 44px; height: 44px; filter: drop-shadow(0 4px 10px rgba(2, 132, 199, 0.35)); }
     .brand-title { font-size: 1.55rem; font-weight: 800; color: var(--primary-dark); line-height: 1; }
     .brand-sub { font-size: 0.8rem; font-weight: 700; color: var(--primary); letter-spacing: 1.5px; }
 
-    .nav-pills { display: flex; align-items: center; gap: 8px; list-style: none; }
+    .nav-pills { display: flex; align-items: center; gap: 8px; list-style: none; flex-wrap: wrap; }
     .nav-btn {
       background: transparent; border: none; color: var(--text-muted); font-weight: 600;
       font-size: 0.92rem; cursor: pointer; padding: 8px 16px; border-radius: 20px; transition: var(--transition);
@@ -82,7 +83,7 @@
 
     .btn-pill {
       padding: 9px 20px; border-radius: 30px; font-weight: 700; font-size: 0.88rem;
-      border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: var(--transition);
+      border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: var(--transition);
       white-space: nowrap;
     }
     .btn-pill-cyan { background: linear-gradient(135deg, #bae6fd 0%, #7dd3fc 100%); color: #0369a1; }
@@ -231,7 +232,9 @@
     .footer-col a { color: #94a3b8; text-decoration: none; }
     .footer-col a:hover { color: #38bdf8; }
 
-    /* Mobil va planshet uchun moslashuv */
+    /* ========================================================
+       MOBIL VA PLANSHET UCHUN TO'LIQ MOSLASHUVCHANLIK (RESPONSIVE)
+       ======================================================== */
     @media (max-width: 1024px) {
       .hero-layout, .footer-grid { grid-template-columns: 1fr; }
       .services-grid-dynamic, .doctors-row-dynamic { grid-template-columns: repeat(2, 1fr); }
@@ -255,20 +258,37 @@
         gap: 14px;
       }
 
+      /* Mobilda menyuni o'ngga surilib ketmasligi uchun 2 qatorli flex qilingan */
       .nav-pills {
         display: flex !important;
-        overflow-x: auto;
-        white-space: nowrap;
-        padding-bottom: 6px;
+        flex-wrap: wrap !important;
+        justify-content: center;
         gap: 6px;
-        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        padding: 0;
       }
-      .nav-pills::-webkit-scrollbar { display: none; }
 
-      .nav-btn, .btn-pill {
+      .nav-pills li {
+        display: inline-flex;
+      }
+
+      .nav-btn {
         padding: 6px 12px;
+        font-size: 0.82rem;
+      }
+
+      /* Qabulga yozilish va Admin tugmalarini pastki qatorga to'liq qulay qilib chiqarish */
+      .nav-pills li:nth-last-child(2),
+      .nav-pills li:last-child {
+        flex: 1 1 45%;
+      }
+
+      .nav-pills li:nth-last-child(2) .btn-pill,
+      .nav-pills li:last-child .btn-pill {
+        width: 100%;
+        text-align: center;
+        padding: 8px 10px;
         font-size: 0.8rem;
-        flex-shrink: 0;
       }
 
       .main-heading {
@@ -785,7 +805,7 @@
           if (syncEl) syncEl.textContent = `Sinxron: ${ts}`;
         }
       } catch (err) {
-        console.warn("Render serveriga ulanish kutilmoqda (kesh ishlatilmoqda)...", err);
+        console.warn("Render serveriga ulanish kutilmoqda...", err);
         const cached = localStorage.getItem("humomed_full_db");
         if (cached) DB = JSON.parse(cached);
       }
@@ -809,7 +829,7 @@
       }
     }
 
-    // 3. Online Tahlil Tekshirish (Telegram botdan kelgan natijalar uchun to'liq to'g'irlangan qidiruv)
+    // 3. Online Tahlil Tekshirish
     async function executeLabCheck(customInputId = null) {
       let inputElem = null;
       if (customInputId) {
@@ -886,7 +906,6 @@
       );
     }
 
-    // Topilgan tahlilni oynada chiroyli ko'rsatish
     function renderFoundLab(data) {
       let fileBtn = "";
       if (data.fileUrl) {
