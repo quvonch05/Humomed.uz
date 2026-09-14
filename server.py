@@ -162,6 +162,8 @@ async def start_server():
     cors.add(app.router.add_post('/api/results', api_save_lab))
     cors.add(app.router.add_get('/api/results/{code}', api_get_by_code))
     cors.add(app.router.add_delete('/api/results/{code}', api_delete_lab))
+    cors.add(app.router.add_get('/api/site-data', api_get_site_data))
+    cors.add(app.router.add_post('/api/site-data', api_save_site_data))
 
     runner = web.AppRunner(app)
     await runner.setup()
@@ -182,3 +184,33 @@ async def start_server():
 
 if __name__ == "__main__":
     asyncio.run(start_server())
+    SITE_DATA_FILE = "site_data.json"
+
+def load_site_data():
+    if not os.path.exists(SITE_DATA_FILE):
+        return {}
+    try:
+        with open(SITE_DATA_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+def save_site_data(data):
+    with open(SITE_DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+# Sayt sozlamalari va menyularini olish (GET)
+async def api_get_site_data(request):
+    data = load_site_data()
+    return web.json_response(data)
+
+# Admin paneldan kelgan yangilanishlarni saqlash (POST)
+async def api_save_site_data(request):
+    try:
+        body = await request.json()
+        current_data = load_site_data()
+        current_data.update(body)
+        save_site_data(current_data)
+        return web.json_response({"status": "success", "message": "Ma'lumotlar saqlandi!"})
+    except Exception as e:
+        return web.json_response({"status": "error", "message": str(e)}, status=500)
