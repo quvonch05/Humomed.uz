@@ -64,15 +64,20 @@
     .top-bar {
       display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1px solid rgba(255, 255, 255, 0.8); padding-bottom: 20px;
-      gap: 12px;
+      gap: 16px;
     }
 
-    .brand-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; flex-shrink: 0; }
+    .top-bar-header {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%;
+    }
+
+    .brand-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; flex-shrink: 0; }
     .brand-svg { width: 44px; height: 44px; filter: drop-shadow(0 4px 10px rgba(2, 132, 199, 0.35)); }
     .brand-title { font-size: 1.55rem; font-weight: 800; color: var(--primary-dark); line-height: 1; }
-    .brand-sub { font-size: 0.8rem; font-weight: 700; color: var(--primary); letter-spacing: 1.5px; }
+    .brand-sub { font-size: 0.78rem; font-weight: 700; color: var(--primary); letter-spacing: 1.5px; }
 
-    .nav-wrapper { display: flex; align-items: center; gap: 12px; }
+    .nav-wrapper { display: flex; align-items: center; gap: 8px; }
     .nav-pills { display: flex; align-items: center; gap: 6px; list-style: none; }
     .nav-btn {
       background: transparent; border: none; color: var(--text-muted); font-weight: 600;
@@ -233,7 +238,6 @@
     .footer-col a { color: #94a3b8; text-decoration: none; }
     .footer-col a:hover { color: #38bdf8; }
 
-    /* Maxfiy, qulay xodimlar kirishi linki */
     .admin-secret-link {
       color: #475569;
       text-decoration: none;
@@ -244,12 +248,10 @@
       gap: 4px;
       transition: var(--transition);
     }
-    .admin-secret-link:hover {
-      color: var(--cyan);
-    }
+    .admin-secret-link:hover { color: var(--cyan); }
 
     /* ========================================================
-       MOBIL VA PLANSHET UCHUN TO'LIQ MOSLASHUVCHANLIK (RESPONSIVE)
+       MOBIL VA PLANSHET MOSLASHUVCHANLIGI (RESPONSIVE)
        ======================================================== */
     @media (max-width: 1024px) {
       .hero-layout, .footer-grid { grid-template-columns: 1fr; }
@@ -258,24 +260,33 @@
 
     @media (max-width: 768px) {
       body {
-        padding: 10px 6px;
-        perspective: none;
+        padding: 8px 6px;
+        perspective: none !important;
+      }
+
+      /* 3D burilishni o'chirib, kontentni mutlaqo tekis qilish */
+      .app-container {
+        transform: none !important;
+        perspective: none !important;
+        transform-style: flat !important;
       }
 
       .main-board {
         padding: 16px 12px;
         border-radius: 20px;
-        gap: 16px;
+        gap: 14px;
+        transform: none !important;
       }
 
-      /* Tepa qism - brend va Qabul tugmasi yonma-yon */
       .top-bar {
+        display: flex;
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
-        padding-bottom: 14px;
+        padding-bottom: 12px;
       }
 
+      /* Logotip va tugma bitta to'g'ri qatorda */
       .top-bar-header {
         display: flex;
         align-items: center;
@@ -283,11 +294,22 @@
         width: 100%;
       }
 
+      .brand-title { font-size: 1.3rem; }
+      .brand-sub { font-size: 0.68rem; }
+      .brand-svg { width: 36px; height: 36px; }
+
+      .btn-pill-cyan {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        transform: none !important;
+      }
+
+      /* 4 ta menyu bo'limi - gorizontal tekis qator */
       .nav-wrapper {
         width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        padding-bottom: 4px;
+        padding-bottom: 2px;
       }
       .nav-wrapper::-webkit-scrollbar { display: none; }
 
@@ -295,17 +317,21 @@
         display: flex;
         flex-wrap: nowrap;
         gap: 6px;
-        width: max-content;
-        margin: 0 auto;
+        width: 100%;
+        justify-content: space-between;
       }
 
       .nav-btn {
-        padding: 6px 12px;
-        font-size: 0.8rem;
+        padding: 7px 10px;
+        font-size: 0.78rem;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 12px;
+        flex: 1;
+        text-align: center;
       }
 
       .main-heading {
-        font-size: 1.65rem;
+        font-size: 1.6rem;
         line-height: 1.25;
         margin-bottom: 16px;
         text-align: center;
@@ -388,7 +414,7 @@
   <div class="app-container" id="boardContainer">
     <div class="main-board">
 
-      <!-- Top Navbar: Ixcham, zamonaviy va mobilga mos -->
+      <!-- TOP NAVBAR -->
       <div class="top-bar">
         <div class="top-bar-header">
           <div class="brand-logo" onclick="switchNavView('home')">
@@ -410,7 +436,6 @@
           <button class="btn-pill btn-pill-cyan" onclick="scrollToBooking()">Qabulga yozilish</button>
         </div>
 
-        <!-- 4 ta asosiy menyu bo'limi -->
         <div class="nav-wrapper">
           <ul class="nav-pills">
             <li><button class="nav-btn active" onclick="switchNavView('home')">Bosh sahifa</button></li>
@@ -544,7 +569,7 @@
               </ul>
             </div>
           </div>
-          <!-- Admin Panelni ko'zga tashlanmaydigan, qulay joyi: Footer pastki qismi -->
+          <!-- Admin Panel: Footer pastki qismida xodimlar uchun -->
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; padding-top: 20px; flex-wrap: wrap; gap: 10px;">
             <div>&copy; 2026 Humo Med. Barcha huquqlar himoyalangan.</div>
             <a class="admin-secret-link" onclick="handleAdminClick()"><i data-lucide="lock" style="width: 13px;"></i> Xodimlar kirishi</a>
@@ -1414,7 +1439,7 @@
       document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
     }
 
-    // 7. 3D Background & Tilt
+    // 7. 3D Background & Tilt (Faqat kompyuter uchun, mobilda o'chirilgan)
     const board = document.getElementById('boardContainer');
     window.addEventListener('mousemove', (e) => {
       if (window.innerWidth <= 768) return;
