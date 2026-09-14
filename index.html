@@ -1704,6 +1704,136 @@ async function syncFromTelegramBotAPI() {
     alert("⚠️ Python server (localhost:8080) ishga tushirilmagan. Avval server.py faylini ishga tushiring!");
   }
 }
+
+// Markaziy server manzili (Render.com)
+const API_BASE_URL = "https://humomed-uz.onrender.com";
+
+// Tahlillar ro'yxatini serverdan tortib olish (Har qanday qurilma ochilganda ishlaydi)
+async function syncLabDataFromServer() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/results`);
+    if (res.ok) {
+      const data = await res.json();
+      localStorage.setItem("humomed_labs", JSON.stringify(data));
+      if (typeof renderAdminLabList === "function") {
+        renderAdminLabList();
+      }
+    }
+  } catch (err) {
+    console.warn("Server bilan aloqa vaqtincha sekin:", err);
+  }
+}
+
+// Bemor tahlil kodini qidirganda ishlaydigan funksiya
+async function executeLabCheck() {
+  const inputElem = document.getElementById("directLabInput") || document.getElementById("labCodeInput");
+  if (!inputElem || !inputElem.value.trim()) {
+    alert("Iltimos, tahlil kodini kiriting (Masalan: HM-0077)");
+    return;
+  }
+
+  const searchCode = inputElem.value.trim().toUpperCase();
+
+  // Kutilmoqda bildirishnomasi
+  if (typeof showInfoModal === "function") {
+    showInfoModal("Qidirilmoqda 🔍", `<p style="color:#64748b;">Markaziy bazadan «${searchCode}» tahlili qidirilmoqda...</p>`);
+  }
+
+  try {
+    // 1. Jonli Render serveridan qidirish
+    const res = await fetch(`${API_BASE_URL}/api/results/${searchCode}`);
+    if (res.ok) {
+      const json = await res.json();
+      renderResultCard(json.data);
+      return;
+    } else {
+      throw new Error("Serverda topilmadi");
+    }
+  } catch (e) {
+    // 2. Agar server uxlab qolgan bo'lsa, zaxira keshdan qidirish
+    const cached = JSON.parse(localStorage.getItem("humomed_labs") || "[]");
+    const found = cached.find(item => item.code.toUpperCase() === searchCode);
+    if (found) {
+      renderResultCard(found);
+    } else {
+      alert(`«${searchCode}» raqamli tahlil topilmadi! Kod to'g'ri kiritilganligini tekshiring.`);
+    }
+  }
+}
+
+// Natijani oynada chiqarish
+function renderResultCard(data) {
+  let downloadBtn = "";
+  if (data.fileUrl) {
+    downloadBtn = `
+      <a href="${data.fileUrl}" target="_blank" class="btn-pill btn-pill-cyan" style="display:block; text-align:center; margin-top:12px; text-decoration:none; padding:10px; background:#0284c7; color:#fff; border-radius:8px;">
+        📄 Shifokor Yuklagan Faylni Ochish (PDF/Rasm)
+      </a>
+    `;
+  }
+
+  const content = `
+    <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:12px; padding:16px; font-family:sans-serif;">
+      <h3 style="margin-top:0; color:#0f172a;">Tahlil Kodi: ${data.code}</h3>
+      <p><b>Bemor:</b> ${data.patient}</p>
+      <p><b>Tahlil turi:</b> ${data.testType}</p>
+      <p><b>Shifokor:</b> ${data.doctor}</p>
+      <p><b>Sana:</b> ${data.date}</p>
+      <div style="background:#fff; border-left:4px solid #0284c7; padding:8px 12px; margin-top:10px;">
+        <b>Tibbiy Xulosa:</b>
+        <p style="margin:4px 0 0 0; color:#334155;">${data.summary}</p>
+      </div>
+      ${downloadBtn}
+    </div>
+  `;
+
+  if (typeof showInfoModal === "function") {
+    showInfoModal("Tahlil Natijasi ✅", content);
+  } else {
+    alert(`Bemor: ${data.patient}\nXulosa: ${data.summary}`);
+  }
+}
+
+// Admin panelda yangi tahlil qo'shilganda barcha qurilmalar uchun umumiy serverga yuborish
+async function saveLabFromAdmin(newLabData) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/results`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newLabData)
+    });
+
+    if (res.ok) {
+      alert("✅ Muvaffaqiyatli saqlandi! Barcha qurilmalarda darhol ko'rinadi.");
+      syncLabDataFromServer();
+    } else {
+      alert("❌ Xatolik: Serverga saqlab bo'lmadi.");
+    }
+  } catch (err) {
+    alert("⚠️ Render serveriga ulanib bo'lmadi. Server uyg'onishini kuting!");
+  }
+}
+
+// Admin panelda tahlilni o'chirish
+async function deleteLabFromAdmin(code) {
+  if (!confirm(`«${code}» tahlilini o'chirishga ishonchingiz komilmi?`)) return;
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/results/${code}`, {
+      method: "DELETE"
+    });
+    if (res.ok) {
+      alert("✅ Tahlil bazadan butunlay o'chirildi!");
+      syncLabDataFromServer();
+    }
+  } catch (e) {
+    alert("⚠️ Xatolik yuz berdi!");
+  }
+}
+
+// Sahifa ochilganda avtomatik serverdan yangilab olish
+document.addEventListener("DOMContentLoaded", () => {
+  syncLabDataFromServer();
+});
   </script>
 </body>
 </html>
