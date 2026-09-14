@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Humo Med — 3D Portal, Admin & TG Bot Tahlillar</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,6 +74,7 @@
     .nav-btn {
       background: transparent; border: none; color: var(--text-muted); font-weight: 600;
       font-size: 0.92rem; cursor: pointer; padding: 8px 16px; border-radius: 20px; transition: var(--transition);
+      white-space: nowrap;
     }
     .nav-btn:hover, .nav-btn.active {
       color: var(--primary-dark); background: rgba(255, 255, 255, 0.85); box-shadow: 0 4px 12px rgba(0,0,0,0.03);
@@ -82,6 +83,7 @@
     .btn-pill {
       padding: 9px 20px; border-radius: 30px; font-weight: 700; font-size: 0.88rem;
       border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: var(--transition);
+      white-space: nowrap;
     }
     .btn-pill-cyan { background: linear-gradient(135deg, #bae6fd 0%, #7dd3fc 100%); color: #0369a1; }
     .btn-pill-blue { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35); }
@@ -229,15 +231,120 @@
     .footer-col a { color: #94a3b8; text-decoration: none; }
     .footer-col a:hover { color: #38bdf8; }
 
+    /* Mobil va planshet uchun moslashuv */
     @media (max-width: 1024px) {
       .hero-layout, .footer-grid { grid-template-columns: 1fr; }
       .services-grid-dynamic, .doctors-row-dynamic { grid-template-columns: repeat(2, 1fr); }
-      .nav-pills { display: none; }
     }
-    @media (max-width: 640px) {
-      .services-grid-dynamic, .doctors-row-dynamic { grid-template-columns: 1fr; }
-      .main-heading { font-size: 1.9rem; }
-      .main-board { padding: 20px 16px; }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px 8px;
+        perspective: none;
+      }
+
+      .main-board {
+        padding: 20px 14px;
+        border-radius: 20px;
+        gap: 20px;
+      }
+
+      .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+      }
+
+      .nav-pills {
+        display: flex !important;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 6px;
+        gap: 6px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .nav-pills::-webkit-scrollbar { display: none; }
+
+      .nav-btn, .btn-pill {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+      }
+
+      .main-heading {
+        font-size: 1.7rem;
+        line-height: 1.25;
+        margin-bottom: 16px;
+        text-align: center;
+      }
+
+      .services-grid-dynamic, .doctors-row-dynamic {
+        grid-template-columns: 1fr;
+      }
+
+      .lab-check-box, .booking-pod {
+        padding: 16px;
+        border-radius: 18px;
+      }
+
+      .lab-input-container {
+        flex-direction: column;
+        border-radius: 16px;
+        padding: 8px;
+      }
+
+      .lab-input-field {
+        width: 100%;
+        text-align: center;
+        padding: 8px 0;
+      }
+
+      .btn-lab-check {
+        width: 100%;
+        text-align: center;
+      }
+
+      #bookingBox > div[style*="display: flex; gap: 8px;"] {
+        flex-direction: column !important;
+        gap: 10px !important;
+      }
+
+      .time-slots {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .admin-dashboard {
+        padding: 16px 12px;
+        border-radius: 18px;
+      }
+
+      .admin-nav {
+        overflow-x: auto;
+        white-space: nowrap;
+        flex-wrap: nowrap;
+        padding-bottom: 8px;
+      }
+      .admin-nav::-webkit-scrollbar { display: none; }
+
+      .admin-tab-btn {
+        flex-shrink: 0;
+        font-size: 0.8rem;
+        padding: 6px 12px;
+      }
+
+      .admin-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .modal-box {
+        padding: 20px 16px;
+        max-height: 90vh;
+        overflow-y: auto;
+        border-radius: 18px;
+      }
     }
   </style>
 </head>
@@ -322,9 +429,9 @@
                   class="lab-input-field" 
                   placeholder="HM-0077" 
                   value="HM-0077" 
-                  onkeydown="if(event.key==='Enter') executeLabCheck();"
+                  onkeydown="if(event.key==='Enter') executeLabCheck('directLabInput');"
                 />
-                <button class="btn-lab-check" onclick="executeLabCheck()">Tekshirish</button>
+                <button class="btn-lab-check" onclick="executeLabCheck('directLabInput')">Tekshirish</button>
               </div>
 
               <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px; font-size: 0.72rem; color: #64748b;">
@@ -412,8 +519,8 @@
         <div class="lab-check-box" style="max-width: 600px;">
           <div class="lab-check-title">Tahlil chekingizdagi kodni kiriting:</div>
           <div class="lab-input-container">
-            <input type="text" id="fullViewLabInput" class="lab-input-field" placeholder="Masalan: HM-0077" value="HM-0077" />
-            <button class="btn-lab-check" onclick="document.getElementById('directLabInput').value = document.getElementById('fullViewLabInput').value; executeLabCheck();">Tekshirish</button>
+            <input type="text" id="fullViewLabInput" class="lab-input-field" placeholder="Masalan: HM-0077" value="HM-0077" onkeydown="if(event.key==='Enter') executeLabCheck('fullViewLabInput');" />
+            <button class="btn-lab-check" onclick="executeLabCheck('fullViewLabInput')">Tekshirish</button>
           </div>
         </div>
       </div>
@@ -432,7 +539,7 @@
       <!-- 4. ADMIN PANEL -->
       <div id="view-admin" class="view-content">
         <div class="admin-dashboard">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
             <div>
               <h2 style="font-size: 1.5rem; color: #0f172a; font-weight: 800;">Humo Med — Boshqaruv Markazi</h2>
               <p style="font-size: 0.85rem; color: var(--text-muted);">Markaziy server orqali barcha qurilmalar bilan real-vaqt sinxronizatsiya.</p>
@@ -458,7 +565,7 @@
           </div>
 
           <div id="sec-lab" class="admin-section active">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
               <div>
                 <h3 style="font-size: 1.1rem; color: #1e293b;">Online Tahlillar Ro‘yxati</h3>
                 <p style="font-size: 0.8rem; color: #64748b;">Botdan yoki qo'lda qo'shilgan ma'lumotlar umumiy serverda saqlanadi.</p>
@@ -486,7 +593,7 @@
           </div>
 
           <div id="sec-services" class="admin-section">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <h3 style="font-size: 1.1rem; color: #1e293b;">Diagnostika & Xizmatlar</h3>
               <button class="btn-add" onclick="openServiceModal()">+ Yangi Xizmat</button>
             </div>
@@ -505,7 +612,7 @@
           </div>
 
           <div id="sec-doctors" class="admin-section">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <h3 style="font-size: 1.1rem; color: #1e293b;">Shifokorlar</h3>
               <button class="btn-add" onclick="openDoctorModal()">+ Yangi Shifokor</button>
             </div>
@@ -589,7 +696,7 @@
         <textarea id="labSummaryModal" class="admin-input" style="height: 60px; resize: none;" placeholder="Barcha me'yorlar doirasida..."></textarea>
       </div>
       <div style="margin-bottom: 16px;">
-        <label style="font-size: 0.8rem; font-weight: 700;">Natija Fayli (PDF/Rasm havolasi yoki tanlash):</label>
+        <label style="font-size: 0.8rem; font-weight: 700;">Natija Fayli (PDF/Rasm havolasi):</label>
         <input type="text" id="labResultFileUrl" class="admin-input" placeholder="https://... fayl havolasi" />
       </div>
       <button class="btn-submit-3d" onclick="saveLabResult()">Serverga Saqlash</button>
@@ -657,7 +764,6 @@
 
   <!-- JAVASCRIPT VA SERVER SINXRONIZATSIYA -->
   <script>
-    // JONLI RENDER SERVER MANZILI
     const API_BASE_URL = "https://humomed-uz.onrender.com";
 
     let DB = {
@@ -703,41 +809,75 @@
       }
     }
 
-    // 3. Online Tahlil Tekshirish
-    async function executeLabCheck() {
-      const rawInput = document.getElementById('directLabInput').value.trim();
-      if (!rawInput) {
+    // 3. Online Tahlil Tekshirish (Telegram Botdan kelgan natijalar uchun to'g'irlangan qidiruv)
+    async function executeLabCheck(customInputId = null) {
+      let inputElem = null;
+      if (customInputId) {
+        inputElem = document.getElementById(customInputId);
+      } else {
+        inputElem = document.getElementById('directLabInput') || document.getElementById('fullViewLabInput');
+      }
+
+      if (!inputElem || !inputElem.value.trim()) {
         showInfoModal("Eslatma", "Iltimos, tahlil chekingizdagi kodni kiriting (Masalan: HM-0077)");
         return;
       }
-      const searchCode = rawInput.toUpperCase();
 
-      showInfoModal("Qidirilmoqda 🔍", `<p style="color:#64748b;">Markaziy serverdan ${searchCode} tahlili yuklanmoqda...</p>`);
+      // Probellarni va keraksiz belgilarni tozalash
+      const searchCode = inputElem.value.trim().toUpperCase().replace(/\s+/g, '');
+
+      showInfoModal("Qidirilmoqda 🔍", `<p style="color:#64748b;">Markaziy serverdan <b>${searchCode}</b> tahlili yuklanmoqda...</p>`);
 
       try {
+        // 1. To'g'ridan-to'g'ri Render API'ga murojaat
         const res = await fetch(`${API_BASE_URL}/api/results/${searchCode}`);
         if (res.ok) {
           const json = await res.json();
-          displayLabResultModal(json.data);
-          return;
+          if (json && json.data) {
+            displayLabResultModal(json.data);
+            return;
+          }
         }
-      } catch (err) {}
+      } catch (err) {
+        console.warn("Alohida qidiruvda xatolik:", err);
+      }
 
+      // 2. Agar alohida topilmasa, butun DBni yangilab tekshirish
+      try {
+        const fullRes = await fetch(`${API_BASE_URL}/api/db`);
+        if (fullRes.ok) {
+          DB = await fullRes.json();
+          localStorage.setItem("humomed_full_db", JSON.stringify(DB));
+          
+          if (DB.lab_results && DB.lab_results[searchCode]) {
+            displayLabResultModal(DB.lab_results[searchCode]);
+            return;
+          }
+        }
+      } catch (e) {
+        console.error("Bazani yuklashda xatolik:", e);
+      }
+
+      // 3. Mahalliy keshdan tekshirish
       if (DB.lab_results && DB.lab_results[searchCode]) {
         displayLabResultModal(DB.lab_results[searchCode]);
-      } else {
-        showInfoModal(
-          "Tahlil Topilmadi 🔍",
-          `<div style="color:#b91c1c; font-weight:700; margin-bottom:8px;">«${searchCode}» raqamli tahlil topilmadi!</div>
-           <p style="font-size:0.85rem; color:#64748b;">Telegram botdan hali bu kod kiritilmagan bo'lishi mumkin.</p>`
-        );
+        return;
       }
+
+      // 4. Serverda ham, keshda ham topilmasa
+      showInfoModal(
+        "Tahlil Topilmadi 🔍",
+        `<div style="color:#b91c1c; font-weight:700; margin-bottom:8px;">«${searchCode}» raqamli tahlil topilmadi!</div>
+         <p style="font-size:0.85rem; color:#64748b;">
+           Telegram bot orqali kiritilgan kod to‘g‘riligini (masalan: <b>HM-0077</b>) tekshiring yoki shifokor bilan bog‘laning.
+         </p>`
+      );
     }
 
     function displayLabResultModal(found) {
       let fileBtn = found.fileUrl 
         ? `<a href="${found.fileUrl}" target="_blank" class="btn-pill btn-pill-cyan" style="width:100%; justify-content:center; margin-top:14px; text-decoration:none;">📥 Faylni Ochish (PDF/Rasm)</a>`
-        : `<button class="btn-pill btn-pill-cyan" style="width:100%; justify-content:center; margin-top:14px;" onclick="alert('PDF yuklab olinmoqda...')">📥 Elektron Sertifikatni Yuklab Olish (PDF)</button>`;
+        : `<button class="btn-pill btn-pill-cyan" style="width:100%; justify-content:center; margin-top:14px;" onclick="alert('Elektron sertifikat tayyorlanmoqda...')">📥 Elektron Sertifikatni Yuklab Olish (PDF)</button>`;
 
       showInfoModal(
         `Tahlil Natijasi: ${found.code} ✅`,
@@ -753,7 +893,7 @@
       );
     }
 
-    // 4. Admin CRUD Amallari (Serverga yuboradi)
+    // 4. Admin CRUD Amallari
     function openLabModalNew() {
       document.getElementById('editLabId').value = '';
       document.getElementById('labCodeInputModal').value = 'HM-';
@@ -1217,9 +1357,10 @@
       document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
     }
 
-    // 7. 3D Background & Tilt
+    // 7. 3D Background & Tilt (Faqat kompyuterlar uchun)
     const board = document.getElementById('boardContainer');
     window.addEventListener('mousemove', (e) => {
+      if (window.innerWidth <= 768) return;
       const x = (window.innerWidth / 2 - e.clientX) / 60;
       const y = (window.innerHeight / 2 - e.clientY) / 60;
       board.style.transform = `rotateY(${-x}deg) rotateX(${y}deg)`;
@@ -1275,7 +1416,6 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // Ishga tushirish
     renderFullCalendar();
     fetchFullDatabaseFromServer();
   </script>
