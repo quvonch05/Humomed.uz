@@ -60,10 +60,11 @@
       display: flex; flex-direction: column; gap: 32px;
     }
 
+    /* Top Bar */
     .top-bar {
       display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1px solid rgba(255, 255, 255, 0.8); padding-bottom: 20px;
-      gap: 16px;
+      gap: 12px;
     }
 
     .brand-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; flex-shrink: 0; }
@@ -71,10 +72,11 @@
     .brand-title { font-size: 1.55rem; font-weight: 800; color: var(--primary-dark); line-height: 1; }
     .brand-sub { font-size: 0.8rem; font-weight: 700; color: var(--primary); letter-spacing: 1.5px; }
 
-    .nav-pills { display: flex; align-items: center; gap: 8px; list-style: none; flex-wrap: wrap; }
+    .nav-wrapper { display: flex; align-items: center; gap: 12px; }
+    .nav-pills { display: flex; align-items: center; gap: 6px; list-style: none; }
     .nav-btn {
       background: transparent; border: none; color: var(--text-muted); font-weight: 600;
-      font-size: 0.92rem; cursor: pointer; padding: 8px 16px; border-radius: 20px; transition: var(--transition);
+      font-size: 0.9rem; cursor: pointer; padding: 8px 14px; border-radius: 20px; transition: var(--transition);
       white-space: nowrap;
     }
     .nav-btn:hover, .nav-btn.active {
@@ -82,13 +84,12 @@
     }
 
     .btn-pill {
-      padding: 9px 20px; border-radius: 30px; font-weight: 700; font-size: 0.88rem;
+      padding: 9px 18px; border-radius: 30px; font-weight: 700; font-size: 0.88rem;
       border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: var(--transition);
-      white-space: nowrap;
+      white-space: nowrap; flex-shrink: 0;
     }
     .btn-pill-cyan { background: linear-gradient(135deg, #bae6fd 0%, #7dd3fc 100%); color: #0369a1; }
     .btn-pill-blue { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35); }
-    .btn-pill-dark { background: #0f172a; color: #ffffff; }
     .btn-pill:hover { transform: translateY(-2px); filter: brightness(1.05); }
 
     .view-content { display: none; animation: fadeIn 0.25s ease-out forwards; }
@@ -232,6 +233,21 @@
     .footer-col a { color: #94a3b8; text-decoration: none; }
     .footer-col a:hover { color: #38bdf8; }
 
+    /* Maxfiy, qulay xodimlar kirishi linki */
+    .admin-secret-link {
+      color: #475569;
+      text-decoration: none;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: var(--transition);
+    }
+    .admin-secret-link:hover {
+      color: var(--cyan);
+    }
+
     /* ========================================================
        MOBIL VA PLANSHET UCHUN TO'LIQ MOSLASHUVCHANLIK (RESPONSIVE)
        ======================================================== */
@@ -242,57 +258,54 @@
 
     @media (max-width: 768px) {
       body {
-        padding: 12px 8px;
+        padding: 10px 6px;
         perspective: none;
       }
 
       .main-board {
-        padding: 20px 14px;
+        padding: 16px 12px;
         border-radius: 20px;
-        gap: 20px;
+        gap: 16px;
       }
 
+      /* Tepa qism - brend va Qabul tugmasi yonma-yon */
       .top-bar {
         flex-direction: column;
         align-items: stretch;
-        gap: 14px;
+        gap: 12px;
+        padding-bottom: 14px;
       }
 
-      /* Mobilda menyuni o'ngga surilib ketmasligi uchun 2 qatorli flex qilingan */
-      .nav-pills {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        justify-content: center;
-        gap: 6px;
+      .top-bar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         width: 100%;
-        padding: 0;
       }
 
-      .nav-pills li {
-        display: inline-flex;
+      .nav-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+      }
+      .nav-wrapper::-webkit-scrollbar { display: none; }
+
+      .nav-pills {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 6px;
+        width: max-content;
+        margin: 0 auto;
       }
 
       .nav-btn {
         padding: 6px 12px;
-        font-size: 0.82rem;
-      }
-
-      /* Qabulga yozilish va Admin tugmalarini pastki qatorga to'liq qulay qilib chiqarish */
-      .nav-pills li:nth-last-child(2),
-      .nav-pills li:last-child {
-        flex: 1 1 45%;
-      }
-
-      .nav-pills li:nth-last-child(2) .btn-pill,
-      .nav-pills li:last-child .btn-pill {
-        width: 100%;
-        text-align: center;
-        padding: 8px 10px;
         font-size: 0.8rem;
       }
 
       .main-heading {
-        font-size: 1.7rem;
+        font-size: 1.65rem;
         line-height: 1.25;
         margin-bottom: 16px;
         text-align: center;
@@ -375,33 +388,37 @@
   <div class="app-container" id="boardContainer">
     <div class="main-board">
 
-      <!-- Top Navbar -->
+      <!-- Top Navbar: Ixcham, zamonaviy va mobilga mos -->
       <div class="top-bar">
-        <div class="brand-logo" onclick="switchNavView('home')">
-          <svg class="brand-svg" viewBox="0 0 100 100" fill="none">
-            <path d="M15 50 Q30 20 60 25 T85 50 T60 75 T15 50" fill="url(#hGrad)" />
-            <path d="M20 52 L38 52 L45 35 L55 68 L64 45 L72 52 L80 52" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-            <defs>
-              <linearGradient id="hGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#0288d1" />
-                <stop offset="1" stop-color="#38bdf8" />
-              </linearGradient>
-            </defs>
-          </svg>
-          <div>
-            <div class="brand-title">Humo</div>
-            <div class="brand-sub">MED KLINIKASI</div>
+        <div class="top-bar-header">
+          <div class="brand-logo" onclick="switchNavView('home')">
+            <svg class="brand-svg" viewBox="0 0 100 100" fill="none">
+              <path d="M15 50 Q30 20 60 25 T85 50 T60 75 T15 50" fill="url(#hGrad)" />
+              <path d="M20 52 L38 52 L45 35 L55 68 L64 45 L72 52 L80 52" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              <defs>
+                <linearGradient id="hGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#0288d1" />
+                  <stop offset="1" stop-color="#38bdf8" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div>
+              <div class="brand-title">Humo</div>
+              <div class="brand-sub">MED KLINIKASI</div>
+            </div>
           </div>
+          <button class="btn-pill btn-pill-cyan" onclick="scrollToBooking()">Qabulga yozilish</button>
         </div>
 
-        <ul class="nav-pills">
-          <li><button class="nav-btn active" onclick="switchNavView('home')">Bosh sahifa</button></li>
-          <li><button class="nav-btn" onclick="switchNavView('services')">Xizmatlar</button></li>
-          <li><button class="nav-btn" onclick="switchNavView('doctors')">Shifokorlar</button></li>
-          <li><button class="nav-btn" onclick="switchNavView('lab')">Tahlillar</button></li>
-          <li><button class="btn-pill btn-pill-cyan" onclick="scrollToBooking()">Qabulga yozilish</button></li>
-          <li><button class="btn-pill btn-pill-dark" onclick="handleAdminClick()"><i data-lucide="shield-check" style="width: 16px;"></i> Admin Panel</button></li>
-        </ul>
+        <!-- 4 ta asosiy menyu bo'limi -->
+        <div class="nav-wrapper">
+          <ul class="nav-pills">
+            <li><button class="nav-btn active" onclick="switchNavView('home')">Bosh sahifa</button></li>
+            <li><button class="nav-btn" onclick="switchNavView('services')">Xizmatlar</button></li>
+            <li><button class="nav-btn" onclick="switchNavView('doctors')">Shifokorlar</button></li>
+            <li><button class="nav-btn" onclick="switchNavView('lab')">Tahlillar</button></li>
+          </ul>
+        </div>
       </div>
 
       <!-- 1. BOSH SAHIFA -->
@@ -527,8 +544,10 @@
               </ul>
             </div>
           </div>
-          <div style="text-align: center; font-size: 0.78rem; padding-top: 20px;">
-            &copy; 2026 Humo Med. Barcha huquqlar himoyalangan.
+          <!-- Admin Panelni ko'zga tashlanmaydigan, qulay joyi: Footer pastki qismi -->
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; padding-top: 20px; flex-wrap: wrap; gap: 10px;">
+            <div>&copy; 2026 Humo Med. Barcha huquqlar himoyalangan.</div>
+            <a class="admin-secret-link" onclick="handleAdminClick()"><i data-lucide="lock" style="width: 13px;"></i> Xodimlar kirishi</a>
           </div>
         </footer>
       </div>
@@ -846,7 +865,6 @@
       const searchCode = inputElem.value.trim().toUpperCase().replace(/\s+/g, '');
       showInfoModal("Qidirilmoqda 🔍", `<p style="color:#64748b;">Markaziy serverdan <b>${searchCode}</b> tahlili yuklanmoqda...</p>`);
 
-      // 1-bosqich: To'g'ridan-to'g'ri API endpoint orqali tekshirish
       try {
         const res = await fetch(`${API_BASE_URL}/api/results/${encodeURIComponent(searchCode)}?_=${Date.now()}`);
         if (res.ok) {
@@ -860,7 +878,6 @@
         console.warn("Alohida qidiruvda xatolik:", err);
       }
 
-      // 2-bosqich: To'liq DB orqali qidirish
       try {
         const fullRes = await fetch(`${API_BASE_URL}/api/db?_=${Date.now()}`);
         if (fullRes.ok) {
@@ -889,19 +906,17 @@
         console.error("Bazani yuklashda xatolik:", e);
       }
 
-      // 3-bosqich: Mahalliy keshdan tekshirish
       const localLabs = DB.lab_results || {};
       if (localLabs[searchCode]) {
         renderFoundLab(localLabs[searchCode]);
         return;
       }
 
-      // 4-bosqich: Topilmasa
       showInfoModal(
         "Tahlil Topilmadi 🔍",
         `<div style="color:#b91c1c; font-weight:700; margin-bottom:8px;">«${searchCode}» raqamli tahlil topilmadi!</div>
          <p style="font-size:0.85rem; color:#64748b;">
-           Telegram bot orqali kiritilgan kod to‘g‘riligini (masalan: <b>HM-0077</b>) tekshiring yoki shifokor bilan bog‘laning.
+           Telegram bot orqali kiritilgan kod to‘g‘riligini tekshiring yoki shifokor bilan bog‘laning.
          </p>`
       );
     }
