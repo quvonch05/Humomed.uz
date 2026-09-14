@@ -6,10 +6,10 @@ import aiohttp_cors
 from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters import Command
 
-# 1. Telegram Bot tokeningizni kiriting
-BOT_TOKEN = "7283268717:AAH6F9JJdwJq54COIRZqraaX-vHR07tehEU" # O'zingizning haqiqiy tokeningizni yozing
+# Telegram botingiz tokeni
+BOT_TOKEN = "7283268717:AAH6F9JJdwJq54COIRZqraaX-vHR07tehEU"
 
-bot = Bot(token=BOT_TOKEN) if BOT_TOKEN and "TOKEN" not in BOT_TOKEN else None
+bot = Bot(token=BOT_TOKEN) if BOT_TOKEN and "misol" not in BOT_TOKEN else None
 dp = Dispatcher()
 
 DATA_FILE = "lab_results.json"
@@ -24,7 +24,7 @@ def load_data():
                 "doctor": "Dr. Jasur Aliyev",
                 "date": "2026-09-14",
                 "summary": "Barcha ko'rsatkichlar me'yorda. Gemoglobin: 145 g/l.",
-                "fileUrl": None
+                "fileUrl": ""
             }
         }
         with open(DATA_FILE, "w", encoding="utf-8") as f:
@@ -33,7 +33,7 @@ def load_data():
     try:
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
-    except:
+    except Exception:
         return {}
 
 def save_data(data):
@@ -48,7 +48,8 @@ async def start_handler(message: types.Message):
         "Bemor tahlil natijasini saytga chiqarish uchun quyidagi formatda yuboring:\n"
         "<code>KOD | Bemor Ismi | Tahlil Turi | Vrach Ismi | Xulosa</code>\n\n"
         "<i>Misol:</i>\n"
-        "<code>HM-0077 | Sardor Aliyev | Biokimyo | Dr. Jasur | Natijalar me'yorda</code>"
+        "<code>HM-0077 | Sardor Aliyev | Biokimyo | Dr. Jasur | Natijalar me'yorda</code>\n\n"
+        "📎 PDF yoki Rasm fayl bo‘lsa, uni yuborishda izoh (caption) qismiga shu formatda yozing."
     )
 
 @dp.message(F.text)
@@ -67,9 +68,9 @@ async def handle_file_lab(message: types.Message):
     file_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_info.file_path}"
     await parse_and_store(caption, message, file_url=file_url)
 
-async def parse_and_store(raw_text: str, message: types.Message, file_url=None):
+async def parse_and_store(raw_text: str, message: types.Message, file_url=""):
     if "|" not in raw_text:
-        await message.reply("⚠️ Format noto‘g‘ri! Chiziqcha <b>|</b> bilan ajrating:\n<code>HM-0077 | Ism | Turi | Vrach | Xulosa</code>")
+        await message.reply("⚠️ Format noto‘g‘ri! Elementlarni <b>|</b> bilan ajrating:\n<code>HM-0077 | Ism | Turi | Vrach | Xulosa</code>")
         return
     
     parts = [p.strip() for p in raw_text.split("|")]
@@ -95,12 +96,12 @@ async def parse_and_store(raw_text: str, message: types.Message, file_url=None):
         f"✅ <b>Muvaffaqiyatli saqlandi!</b>\n"
         f"🔑 Kod: <code>{code}</code>\n"
         f"👤 Bemor: {patient}\n"
-        f"Saytda darhol tekshirib ko‘rishingiz mumkin!"
+        f"🌐 Barcha qurilmalarda saytdan tekshirish mumkin!"
     )
 
 # ================= REST API HANDLERS =================
 async def api_health(request):
-    return web.Response(text="Humo Med API is running OK!")
+    return web.Response(text="Humo Med API is working successfully!")
 
 async def api_get_all(request):
     data = load_data()
@@ -113,11 +114,41 @@ async def api_get_by_code(request):
         return web.json_response({"status": "success", "data": data[code]})
     return web.json_response({"status": "not_found", "message": "Tahlil topilmadi"}, status=404)
 
-# ================= SERVER STARTUP =================
+async def api_save_lab(request):
+    try:
+        body = await request.json()
+        code = body.get("code", "").strip().upper()
+        if not code:
+            return web.json_response({"status": "error", "message": "Kod kiritilmagan"}, status=400)
+        
+        db = load_data()
+        db[code] = {
+            "code": code,
+            "patient": body.get("patient", "Bemor"),
+            "testType": body.get("testType", "Tahlil"),
+            "doctor": body.get("doctor", "Shifokor"),
+            "date": body.get("date", "2026-09-14"),
+            "summary": body.get("summary", "Natijalar tayyor."),
+            "fileUrl": body.get("fileUrl", "")
+        }
+        save_data(db)
+        return web.json_response({"status": "success", "message": "Baza yangilandi!"})
+    except Exception as e:
+        return web.json_response({"status": "error", "message": str(e)}, status=500)
+
+async def api_delete_lab(request):
+    code = request.match_info.get('code', '').upper()
+    db = load_data()
+    if code in db:
+        del db[code]
+        save_data(db)
+        return web.json_response({"status": "success", "message": f"{code} o'chirildi"})
+    return web.json_response({"status": "not_found", "message": "Topilmadi"}, status=404)
+
+# ================= ASOSIY ISHGA TUSHIRISH =================
 async def start_server():
     app = web.Application()
     
-    # CORS sozlamasi (Brauzer to'siqsiz ulanishi uchun)
     cors = aiohttp_cors.setup(app, defaults={
         "*": aiohttp_cors.ResourceOptions(
             allow_credentials=True,
@@ -128,7 +159,9 @@ async def start_server():
 
     cors.add(app.router.add_get('/', api_health))
     cors.add(app.router.add_get('/api/results', api_get_all))
+    cors.add(app.router.add_post('/api/results', api_save_lab))
     cors.add(app.router.add_get('/api/results/{code}', api_get_by_code))
+    cors.add(app.router.add_delete('/api/results/{code}', api_delete_lab))
 
     runner = web.AppRunner(app)
     await runner.setup()
@@ -136,16 +169,14 @@ async def start_server():
     port = int(os.environ.get("PORT", 10000))
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
-    print(f"✅ Web server 0.0.0.0:{port} manzilida ochildi!")
+    print(f"🚀 Web Server ishga tushdi: 0.0.0.0:{port}")
 
-    # Telegram botni fonda ishga tushiramiz
     if bot:
-        print("🤖 Telegram Bot polling boshlanmoqda...")
+        print("🤖 Telegram Bot polling boshlandi...")
         asyncio.create_task(dp.start_polling(bot))
     else:
-        print("⚠️ Bot token kiritilmagan, faqat Web API ishlamoqda.")
+        print("⚠️ Bot token ko'rsatilmagan yoki noto'g'ri, faqat Web Server ishlamoqda.")
 
-    # Serverni doimiy uyg'oq tutish
     while True:
         await asyncio.sleep(3600)
 
