@@ -1834,6 +1834,59 @@ async function deleteLabFromAdmin(code) {
 document.addEventListener("DOMContentLoaded", () => {
   syncLabDataFromServer();
 });
+    // 1. Sayt ochilganda markaziy ma'lumotlarni Render'dan yuklab olish
+async function loadDynamicSiteData() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/site-data`);
+    if (res.ok) {
+      const siteData = await res.json();
+      
+      // Agar serverda ma'lumot bo'lsa, mahalliy xotiraga yangilab olamiz
+      if (Object.keys(siteData).length > 0) {
+        localStorage.setItem("humomed_site_data", JSON.stringify(siteData));
+        applySiteDataToUI(siteData);
+      }
+    }
+  } catch (err) {
+    console.warn("Sayt ma'lumotlarini yuklashda xatolik:", err);
+  }
+}
+
+// 2. Yuklangan ma'lumotlarni sahifadagi menyu va bloklarga joylashtirish
+function applySiteDataToUI(data) {
+  // Masalan, xizmatlar yoki menyu bloklarini yangilash
+  if (data.services && typeof renderServicesList === "function") {
+    renderServicesList(data.services);
+  }
+  if (data.doctors && typeof renderDoctorsList === "function") {
+    renderDoctorsList(data.doctors);
+  }
+}
+
+// 3. Admin panelda saqlash tugmasi bosilganda Render'ga yuborish
+async function saveSiteDataFromAdmin(updatedData) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/site-data`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedData)
+    });
+
+    if (res.ok) {
+      alert("✅ O'zgarishlar saqlandi! Endi barcha qurilmalarda yangilanadi.");
+      loadDynamicSiteData();
+    } else {
+      alert("❌ Xatolik: Serverga saqlab bo'lmadi.");
+    }
+  } catch (e) {
+    alert("⚠️ Server bilan aloqa yo'q!");
+  }
+}
+
+// Sahifa yuklanganda ishga tushirish
+document.addEventListener("DOMContentLoaded", () => {
+  loadDynamicSiteData();
+});
   </script>
 </body>
 </html>
