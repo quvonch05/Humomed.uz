@@ -113,14 +113,34 @@
 
     .hero-layout { display: grid; grid-template-columns: 1.18fr 0.82fr; gap: 36px; align-items: start; }
     
-    .hero-header-wrap { display: flex; align-items: center; justify-content: flex-start; gap: 30px; margin-bottom: 28px; }
-    .main-heading { font-size: 2.6rem; font-weight: 900; line-height: 1.15; color: #0c2b4c; margin-bottom: 0; flex: 1; }
+    /* TO'G'RILANDI: Yozuv va rasm doim bir-biriga yaqin turadi */
+    .hero-header-wrap { 
+      display: flex; 
+      align-items: center; 
+      justify-content: flex-start; /* Chapga taqaladi */
+      gap: 40px; /* Aniq 40px masofa */
+      margin-bottom: 32px; 
+    }
+    .main-heading { 
+      font-size: 2.6rem; 
+      font-weight: 900; 
+      line-height: 1.15; 
+      color: #0c2b4c; 
+      margin-bottom: 0; 
+      flex: 0 1 auto; /* To'liq cho'zilib ketmaydi, o'z joyida qoladi */
+    }
     .main-heading span { background: linear-gradient(135deg, #0284c7, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
     .hero-building-img {
-      width: 170px; height: 150px; object-fit: cover; border-radius: 20px;
-      box-shadow: 0 16px 36px rgba(2, 132, 199, 0.15); border: 4px solid #ffffff;
-      flex-shrink: 0; background-color: #e2e8f0; animation: floatBuilding 4s ease-in-out infinite;
+      width: 180px; 
+      height: 160px; 
+      object-fit: cover; 
+      border-radius: 20px;
+      box-shadow: 0 16px 36px rgba(2, 132, 199, 0.15); 
+      border: 4px solid #ffffff;
+      flex-shrink: 0; 
+      background-color: #e2e8f0; 
+      animation: floatBuilding 4s ease-in-out infinite;
     }
 
     @keyframes floatBuilding {
@@ -228,9 +248,9 @@
        ======================================================== */
     @media (max-width: 1024px) {
       .hero-layout, .footer-grid { display: flex !important; flex-direction: column !important; width: 100%; gap: 24px; }
-      .hero-header-wrap { flex-direction: column; text-align: center; width: 100%; }
+      .hero-header-wrap { flex-direction: column; text-align: center; width: 100%; gap: 24px; }
       .main-heading { text-align: center; width: 100%; }
-      .hero-building-img { margin: 0 auto; display: block; }
+      .hero-building-img { margin: 0 auto; display: block; width: 100%; max-width: 400px; height: auto; }
     }
 
     @media (max-width: 768px) {
@@ -269,15 +289,15 @@
         flex-direction: column !important; 
         align-items: center !important;
         text-align: center !important; 
-        gap: 16px !important; 
+        gap: 20px !important; 
         width: 100% !important; 
       }
       .main-heading { font-size: 1.7rem !important; text-align: center !important; width: 100% !important; line-height: 1.25 !important; }
       
       .hero-building-img { 
         width: 100% !important; 
-        max-width: 280px !important; 
-        height: 160px !important; 
+        max-width: 320px !important; 
+        height: 180px !important; 
         margin: 0 auto !important; 
         display: block !important; 
       }
@@ -418,8 +438,6 @@
 
               <div style="display: flex; gap: 8px; margin-bottom: 10px;">
                 <input type="text" id="patientName" class="booking-input" placeholder="Ismingiz..." autocomplete="new-password" />
-                
-                <!-- BU YERDA QAT'IY TOZALANISH KODI (Anti-Autofill hack) -->
                 <input type="tel" id="patientPhone" class="booking-input" placeholder="+998 90 123-45-67" autocomplete="new-password" oninput="this.value = this.value.replace(/[^0-9+ ]/g, '')" />
               </div>
 
@@ -669,12 +687,11 @@
       if(e.ctrlKey && e.keyCode == 85) return false; 
     };
 
-    // YANGILIK: Autofill yozuvlarini majburan tozalash mexanizmi
     window.addEventListener('load', () => {
       setTimeout(() => {
         const phoneInput = document.getElementById('patientPhone');
         if (phoneInput && /[^0-9+ ]/.test(phoneInput.value)) {
-          phoneInput.value = ''; // Agar harf yoki email belgisi @ bo'lsa darhol bo'shatadi
+          phoneInput.value = ''; 
         }
       }, 500);
     });
