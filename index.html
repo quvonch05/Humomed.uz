@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Humo Med — 3D Portal, Admin & TG Bot Tahlillar</title>
+  <title>Humo Med — Klinika</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -111,14 +111,21 @@
 
     .hero-layout { display: grid; grid-template-columns: 1.18fr 0.82fr; gap: 36px; align-items: start; }
     
+    /* TO'G'RILANGAN: Bino rasmi va yozuv yaqinlashtirildi va animatsiya qo'shildi */
     .hero-header-wrap {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 20px;
+      justify-content: flex-start; /* Space-between o'rniga boshiga yig'ildi */
+      gap: 30px; /* Matn va rasm o'rtasidagi aniq va chiroyli masofa */
       margin-bottom: 28px;
     }
-    .main-heading { font-size: 2.6rem; font-weight: 900; line-height: 1.15; color: #0c2b4c; margin-bottom: 0; flex: 1; }
+    .main-heading { 
+      font-size: 2.6rem; 
+      font-weight: 900; 
+      line-height: 1.15; 
+      color: #0c2b4c; 
+      margin-bottom: 0; 
+    }
     .main-heading span { background: linear-gradient(135deg, #0284c7, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
     .hero-building-img {
@@ -129,6 +136,12 @@
       box-shadow: 0 16px 36px rgba(2, 132, 199, 0.15);
       border: 4px solid #ffffff;
       flex-shrink: 0;
+      animation: floatBuilding 4s ease-in-out infinite; /* Jonli suzish effekti */
+    }
+
+    @keyframes floatBuilding {
+      0%, 100% { transform: translateY(0); box-shadow: 0 16px 36px rgba(2, 132, 199, 0.15); }
+      50% { transform: translateY(-10px); box-shadow: 0 24px 40px rgba(2, 132, 199, 0.25); }
     }
     
     .section-title { font-size: 1.18rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -226,7 +239,9 @@
     .admin-secret-link { color: #475569; text-decoration: none; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: var(--transition); }
     .admin-secret-link:hover { color: var(--cyan); }
 
-    /* MOSLASHUVCHANLIK (RESPONSIVE) */
+    /* ========================================================
+       MOBIL VA PLANSHET MOSLASHUVCHANLIGI
+       ======================================================== */
     @media (max-width: 1024px) {
       .hero-layout, .footer-grid { grid-template-columns: 1fr; }
       .services-grid-dynamic, .doctors-row-dynamic { grid-template-columns: repeat(2, 1fr); }
@@ -253,9 +268,10 @@
       .nav-pills { display: flex; flex-wrap: nowrap; gap: 6px; width: 100%; justify-content: space-between; }
       .nav-btn { padding: 7px 10px; font-size: 0.78rem; background: rgba(255, 255, 255, 0.7); border-radius: 12px; flex: 1; text-align: center; }
       
-      .hero-header-wrap { flex-direction: column; text-align: center; gap: 16px; }
+      /* MOBILDA BINO RASMI VA YOZUV TARTIBI (Ketma-ket) */
+      .hero-header-wrap { flex-direction: column; text-align: center; gap: 20px; }
       .main-heading { font-size: 1.65rem; text-align: center; }
-      .hero-building-img { width: 100%; max-width: 280px; height: 160px; }
+      .hero-building-img { width: 100%; max-width: 320px; height: 180px; margin: 0 auto; }
       
       .services-grid-dynamic, .doctors-row-dynamic { grid-template-columns: 1fr; }
       .lab-check-box, .booking-pod { padding: 16px; border-radius: 18px; }
@@ -279,7 +295,6 @@
 
   <div class="app-container" id="boardContainer">
     
-    <!-- KLINIKA MA'LUMOT SATRI -->
     <div class="top-info-bar">
       <div>
         <span><i data-lucide="map-pin" style="width: 14px;"></i> Toshkent sh., Yashnobod tumani</span>
@@ -293,7 +308,6 @@
 
     <div class="main-board">
 
-      <!-- TOP NAVBAR -->
       <div class="top-bar">
         <div class="top-bar-header">
           <div class="brand-logo" onclick="switchNavView('home')">
@@ -316,11 +330,10 @@
         </div>
       </div>
 
-      <!-- 1. BOSH SAHIFA -->
       <div id="view-home" class="view-content active">
         <div class="hero-layout">
           <div>
-            <!-- Yozuv chapda, bino rasmi o'ng tomonda -->
+            
             <div class="hero-header-wrap">
               <h1 class="main-heading">
                 Salomatligingiz —<br/>
@@ -347,7 +360,6 @@
             </div>
           </div>
 
-          <!-- O‘ng blok: Online Tahlillar & Qabul -->
           <div class="right-section">
             
             <div class="lab-check-box">
@@ -377,7 +389,6 @@
               </div>
             </div>
 
-            <!-- QABUL PODI -->
             <div class="booking-pod" id="bookingBox">
               <div style="font-size: 1.1rem; font-weight: 800; color: #0f3460; margin-bottom: 10px; display: flex; justify-content: space-between;">
                 <span>Qabulga Yozilish</span>
@@ -420,7 +431,6 @@
           </div>
         </div>
 
-        <!-- Footer -->
         <footer>
           <div class="footer-grid">
             <div class="footer-col">
@@ -451,7 +461,6 @@
         </footer>
       </div>
 
-      <!-- 2. TAHLILLAR (FULL VIEW) -->
       <div id="view-lab" class="view-content">
         <h2 style="font-size: 1.8rem; font-weight: 800; color: #0c2b4c; margin-bottom: 14px;">Online Tibbiy Tahlillar Markazi</h2>
         <div class="lab-check-box" style="max-width: 600px;">
@@ -463,7 +472,6 @@
         </div>
       </div>
 
-      <!-- 3. XIZMATLAR VA SHIFOKORLAR -->
       <div id="view-services" class="view-content">
         <h2 style="font-size: 1.8rem; font-weight: 800; color: #0c2b4c; margin-bottom: 16px;">Klinika Diagnostika va Xizmatlari</h2>
         <div class="services-grid-dynamic" id="allServicesFullList"></div>
@@ -474,7 +482,6 @@
         <div class="doctors-row-dynamic" id="allDoctorsFullList"></div>
       </div>
 
-      <!-- 4. ADMIN PANEL -->
       <div id="view-admin" class="view-content">
         <div class="admin-dashboard">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
@@ -542,7 +549,6 @@
             </table>
           </div>
 
-          <!-- SOZLAMALAR VA PAROL ALMASHTIRISH -->
           <div id="sec-settings" class="admin-section">
             <h3 style="font-size: 1.1rem; color: #1e293b; margin-bottom: 12px;">Xavfsizlik va Parolni o'zgartirish</h3>
             <div style="background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; max-width: 400px;">
@@ -564,7 +570,6 @@
     </div>
   </div>
 
-  <!-- MODALLAR -->
   <div class="modal-overlay" id="loginModal">
     <div class="modal-box">
       <button class="modal-close" onclick="closeModals()"><i data-lucide="x" style="width: 16px;"></i></button>
@@ -634,7 +639,6 @@
   </div>
 
   <script>
-    // XAVFSIZLIK: Hackerlarga qarshi himoya
     document.addEventListener('contextmenu', event => event.preventDefault()); 
     document.onkeydown = function(e) {
       if(e.keyCode == 123) return false; 
