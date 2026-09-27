@@ -45,7 +45,6 @@
       position: relative; z-index: 10; width: 100%; max-width: 1420px; margin: 0 auto;
     }
 
-    /* YANGI: Klinika ma'lumot satri */
     .top-info-bar {
       background: rgba(2, 132, 199, 0.08);
       border: 1px solid rgba(2, 132, 199, 0.15);
@@ -83,7 +82,6 @@
       display: flex; align-items: center; justify-content: space-between; width: 100%;
     }
 
-    /* Haqiqiy logotip dizayni */
     .brand-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; flex-shrink: 0; }
     .brand-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--cyan); box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25); }
     .brand-title { font-size: 1.6rem; font-weight: 900; color: var(--primary-dark); line-height: 1; }
@@ -112,8 +110,27 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
     .hero-layout { display: grid; grid-template-columns: 1.18fr 0.82fr; gap: 36px; align-items: start; }
-    .main-heading { font-size: 2.6rem; font-weight: 900; line-height: 1.15; color: #0c2b4c; margin-bottom: 20px; }
+    
+    .hero-header-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    .main-heading { font-size: 2.6rem; font-weight: 900; line-height: 1.15; color: #0c2b4c; margin-bottom: 0; flex: 1; }
     .main-heading span { background: linear-gradient(135deg, #0284c7, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    .hero-building-img {
+      width: 170px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 20px;
+      box-shadow: 0 16px 36px rgba(2, 132, 199, 0.15);
+      border: 4px solid #ffffff;
+      flex-shrink: 0;
+    }
+    
     .section-title { font-size: 1.18rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 
     .services-grid-dynamic { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
@@ -143,6 +160,7 @@
     }
 
     .right-section { display: flex; flex-direction: column; gap: 20px; }
+
     .lab-check-box { background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, #e0f2fe 100%); border: 2px solid #ffffff; border-radius: 26px; padding: 22px; box-shadow: 0 16px 36px rgba(2, 132, 199, 0.12); }
     .lab-check-title { font-size: 1.28rem; font-weight: 800; color: #0c2b4c; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
     .lab-input-container { background: #ffffff; border: 1.5px solid #bae6fd; border-radius: 30px; padding: 4px 6px 4px 18px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.06); transition: var(--transition); }
@@ -235,7 +253,10 @@
       .nav-pills { display: flex; flex-wrap: nowrap; gap: 6px; width: 100%; justify-content: space-between; }
       .nav-btn { padding: 7px 10px; font-size: 0.78rem; background: rgba(255, 255, 255, 0.7); border-radius: 12px; flex: 1; text-align: center; }
       
-      .main-heading { font-size: 1.65rem; line-height: 1.25; margin-bottom: 16px; text-align: center; }
+      .hero-header-wrap { flex-direction: column; text-align: center; gap: 16px; }
+      .main-heading { font-size: 1.65rem; text-align: center; }
+      .hero-building-img { width: 100%; max-width: 280px; height: 160px; }
+      
       .services-grid-dynamic, .doctors-row-dynamic { grid-template-columns: 1fr; }
       .lab-check-box, .booking-pod { padding: 16px; border-radius: 18px; }
       .lab-input-container { flex-direction: column; border-radius: 16px; padding: 8px; }
@@ -258,10 +279,10 @@
 
   <div class="app-container" id="boardContainer">
     
-    <!-- YANGI: KLINIKA MA'LUMOT SATRI -->
+    <!-- KLINIKA MA'LUMOT SATRI -->
     <div class="top-info-bar">
       <div>
-        <span><i data-lucide="map-pin" style="width: 14px;"></i> Toshkent sh., Chilonzor tumani</span>
+        <span><i data-lucide="map-pin" style="width: 14px;"></i> Toshkent sh., Yashnobod tumani</span>
         <span class="hide-mobile"><i data-lucide="clock" style="width: 14px;"></i> Du-Shan: 09:00 - 18:00</span>
       </div>
       <div>
@@ -276,7 +297,6 @@
       <div class="top-bar">
         <div class="top-bar-header">
           <div class="brand-logo" onclick="switchNavView('home')">
-            <!-- YANGI: HAQIQIY LOGOTIP JOYLASHDI -->
             <img src="humo_logo.jpg" alt="Humo Logo" class="brand-img" />
             <div>
               <div class="brand-title">Humo</div>
@@ -300,11 +320,15 @@
       <div id="view-home" class="view-content active">
         <div class="hero-layout">
           <div>
-            <h1 class="main-heading">
-              Salomatligingiz —<br/>
-              <span>Humo Klinikasi</span> bilan<br/>
-              ishonchli qo‘llarda
-            </h1>
+            <!-- Yozuv chapda, bino rasmi o'ng tomonda -->
+            <div class="hero-header-wrap">
+              <h1 class="main-heading">
+                Salomatligingiz —<br/>
+                <span>Humo Klinikasi</span> bilan<br/>
+                ishonchli qo‘llarda
+              </h1>
+              <img src="humo_building.jpg" alt="Humo Klinikasi Binosi" class="hero-building-img" />
+            </div>
 
             <div>
               <div class="section-title">
@@ -325,6 +349,7 @@
 
           <!-- O‘ng blok: Online Tahlillar & Qabul -->
           <div class="right-section">
+            
             <div class="lab-check-box">
               <div class="lab-check-title">
                 <i data-lucide="file-check-2" style="color: var(--primary);"></i>
@@ -467,7 +492,6 @@
             <button class="admin-tab-btn" onclick="switchAdminSection('sec-services')"><i data-lucide="layers" style="width: 18px;"></i> Xizmatlar</button>
             <button class="admin-tab-btn" onclick="switchAdminSection('sec-doctors')"><i data-lucide="users" style="width: 18px;"></i> Shifokorlar</button>
             <button class="admin-tab-btn" onclick="switchAdminSection('sec-bookings')"><i data-lucide="inbox" style="width: 18px;"></i> Navbatlar</button>
-            <!-- YANGI: PAROL O'ZGARTIRISH BO'LIMI -->
             <button class="admin-tab-btn" onclick="switchAdminSection('sec-settings')"><i data-lucide="settings" style="width: 18px;"></i> Sozlamalar</button>
           </div>
 
@@ -518,7 +542,7 @@
             </table>
           </div>
 
-          <!-- YANGI: SOZLAMALAR VA PAROL ALMASHTIRISH -->
+          <!-- SOZLAMALAR VA PAROL ALMASHTIRISH -->
           <div id="sec-settings" class="admin-section">
             <h3 style="font-size: 1.1rem; color: #1e293b; margin-bottom: 12px;">Xavfsizlik va Parolni o'zgartirish</h3>
             <div style="background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; max-width: 400px;">
@@ -610,17 +634,14 @@
   </div>
 
   <script>
-    // ==========================================
-    // 1. HACKERLARDAN HIMOYA (ANTI-XSS, ANTI-INSPECT)
-    // ==========================================
-    document.addEventListener('contextmenu', event => event.preventDefault()); // O'ng tugmani yopish
+    // XAVFSIZLIK: Hackerlarga qarshi himoya
+    document.addEventListener('contextmenu', event => event.preventDefault()); 
     document.onkeydown = function(e) {
-      if(e.keyCode == 123) return false; // F12 yopish
-      if(e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) return false; // Ctrl+Shift+I/J/C
-      if(e.ctrlKey && e.keyCode == 85) return false; // Ctrl+U (Source code)
+      if(e.keyCode == 123) return false; 
+      if(e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) return false; 
+      if(e.ctrlKey && e.keyCode == 85) return false; 
     };
 
-    // Zararli skriptlarni (XSS) matndan tozalovchi himoya funksiyasi
     function escapeHTML(str) {
       if (!str) return '';
       return String(str).replace(/[&<>'"]/g, match => {
@@ -668,7 +689,6 @@
         showInfoModal("Eslatma", "Iltimos, tahlil chekingizdagi kodni kiriting (Masalan: HM-0077)");
         return;
       }
-      // Kod faqat harf va raqamdan iborat bo'lishini ta'minlash (himoya)
       const searchCode = inputElem.value.trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
       showInfoModal("Qidirilmoqda 🔍", `<p style="color:#64748b;">Markaziy serverdan <b>${escapeHTML(searchCode)}</b> tahlili yuklanmoqda...</p>`);
 
@@ -973,12 +993,7 @@
 
     function scrollToBooking() { switchNavView('home'); document.getElementById('bookingBox')?.scrollIntoView({ behavior: 'smooth' }); }
 
-    // ==========================================
-    // PAROLNI O'ZGARTIRISH VA TIZIMGA KIRISH
-    // ==========================================
-    function getAuthData() {
-      return DB.auth || { user: 'admin', pass: 'humo2026' }; // Baza bo'sh bo'lsa standart parol
-    }
+    function getAuthData() { return DB.auth || { user: 'admin', pass: 'humo2026' }; }
 
     function handleAdminClick() {
       if (sessionStorage.getItem('humo_admin_auth') === 'true') {
