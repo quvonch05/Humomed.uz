@@ -30,7 +30,7 @@
     input, textarea { user-select: text; }
 
     html, body {
-      overflow-x: hidden !important; /* Gorizontal toshishni butunlay yopadi */
+      overflow-x: hidden !important; 
       width: 100%;
       max-width: 100vw;
     }
@@ -75,7 +75,7 @@
       padding: 36px 44px;
       box-shadow: var(--glass-shadow);
       display: flex; flex-direction: column; gap: 32px;
-      overflow-x: hidden; /* Ichidagi tasmalar tashqariga toshmasligi uchun */
+      overflow-x: hidden; 
     }
 
     .top-bar {
@@ -224,7 +224,7 @@
     .admin-secret-link:hover { color: var(--cyan); }
 
     /* ========================================================
-       MOBIL VA PLANSHET MOSLASHUVCHANLIGI (QAT'IY QOTIRILGAN)
+       MOBIL VA PLANSHET MOSLASHUVCHANLIGI
        ======================================================== */
     @media (max-width: 1024px) {
       .hero-layout, .footer-grid { display: flex !important; flex-direction: column !important; width: 100%; gap: 24px; }
@@ -262,7 +262,6 @@
       .nav-pills { display: flex; flex-wrap: nowrap; gap: 6px; width: 100%; justify-content: space-between; }
       .nav-btn { padding: 7px 10px; font-size: 0.78rem; background: rgba(255, 255, 255, 0.7); border-radius: 12px; flex: 1; text-align: center; }
       
-      /* QAT'IY USTMA-UST TARTIB: Yozuv tepada, rasm pastda */
       .hero-layout > div { width: 100% !important; max-width: 100% !important; min-width: 0 !important; }
       
       .hero-header-wrap { 
@@ -275,7 +274,6 @@
       }
       .main-heading { font-size: 1.7rem !important; text-align: center !important; width: 100% !important; line-height: 1.25 !important; }
       
-      /* Rasm umuman toshib ketmasligi uchun max-width o'rnatildi */
       .hero-building-img { 
         width: 100% !important; 
         max-width: 280px !important; 
@@ -284,7 +282,6 @@
         display: block !important; 
       }
       
-      /* KARTALAR UCHUN GORIZONTAL TASMA */
       .services-grid-dynamic, .doctors-row-dynamic { 
         display: flex !important; 
         flex-wrap: nowrap !important; 
@@ -392,7 +389,7 @@
                 Online Tibbiy Tahlillar
               </div>
               <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
-                Tahlil chekingizdagi kodni kiriting (Telegram botdan yuklangan natijalar real vaqtda chiqadi):
+                Tahlil chekingizdagi kodni kiriting:
               </p>
 
               <div class="lab-input-container">
@@ -420,8 +417,10 @@
               </div>
 
               <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                <input type="text" id="patientName" class="booking-input" placeholder="Ismingiz..." />
-                <input type="tel" id="patientPhone" class="booking-input" placeholder="+998 90 123-45-67" autocomplete="tel" oninput="this.value = this.value.replace(/[^0-9+ ]/g, '')" />
+                <input type="text" id="patientName" class="booking-input" placeholder="Ismingiz..." autocomplete="new-password" />
+                
+                <!-- BU YERDA QAT'IY TOZALANISH KODI (Anti-Autofill hack) -->
+                <input type="tel" id="patientPhone" class="booking-input" placeholder="+998 90 123-45-67" autocomplete="new-password" oninput="this.value = this.value.replace(/[^0-9+ ]/g, '')" />
               </div>
 
               <select id="bookingServiceSelect" class="booking-input" style="margin-bottom: 10px;" onchange="updateBookedSlotsUI()"></select>
@@ -669,6 +668,16 @@
       if(e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) return false; 
       if(e.ctrlKey && e.keyCode == 85) return false; 
     };
+
+    // YANGILIK: Autofill yozuvlarini majburan tozalash mexanizmi
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const phoneInput = document.getElementById('patientPhone');
+        if (phoneInput && /[^0-9+ ]/.test(phoneInput.value)) {
+          phoneInput.value = ''; // Agar harf yoki email belgisi @ bo'lsa darhol bo'shatadi
+        }
+      }, 500);
+    });
 
     function escapeHTML(str) {
       if (!str) return '';
@@ -1077,9 +1086,6 @@
     }
     function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
 
-    // ==========================================
-    // MOBIL QURILMALARDA AVTOMATIK AYLANTIRISH (TICKER) - QOTISH TUZATILDI
-    // ==========================================
     document.addEventListener('DOMContentLoaded', () => {
       ['servicesFrontendList', 'doctorsFrontendList'].forEach(id => {
         const el = document.getElementById(id);
@@ -1096,13 +1102,10 @@
       if (window.innerWidth > 768) return; 
       ['servicesFrontendList', 'doctorsFrontendList'].forEach(id => {
         const container = document.getElementById(id);
-        
         if (!container || container.children.length <= 1) return;
         if (container.dataset.isTouched === 'true') return;
 
         const maxScroll = container.scrollWidth - container.clientWidth;
-        
-        // YANGILIK: Agar yashirin qism 50 pikseldan kam bo'lsa (ya'ni hammasi ekranga sig'sa), umuman qimirlamaydi
         if (maxScroll <= 50) return; 
 
         if (container.scrollLeft >= maxScroll - 15) {
