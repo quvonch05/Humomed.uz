@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Humo Med — Klinika</title>
+  <title>Humo Med — 3D Portal, Admin & TG Bot Tahlillar</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -29,11 +29,16 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; user-select: none; }
     input, textarea { user-select: text; }
 
+    html, body {
+      overflow-x: hidden !important; /* Gorizontal toshishni butunlay yopadi */
+      width: 100%;
+      max-width: 100vw;
+    }
+
     body {
       min-height: 100vh;
       background: var(--bg-gradient);
       color: var(--text-main);
-      overflow-x: hidden;
       padding: 14px;
     }
 
@@ -70,6 +75,7 @@
       padding: 36px 44px;
       box-shadow: var(--glass-shadow);
       display: flex; flex-direction: column; gap: 32px;
+      overflow-x: hidden; /* Ichidagi tasmalar tashqariga toshmasligi uchun */
     }
 
     .top-bar {
@@ -78,12 +84,10 @@
       gap: 16px;
     }
 
-    .top-bar-header {
-      display: flex; align-items: center; justify-content: space-between; width: 100%;
-    }
+    .top-bar-header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
 
     .brand-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; flex-shrink: 0; }
-    .brand-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--cyan); box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25); }
+    .brand-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--cyan); box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25); background-color: #fff; }
     .brand-title { font-size: 1.6rem; font-weight: 900; color: var(--primary-dark); line-height: 1; }
     .brand-sub { font-size: 0.75rem; font-weight: 800; color: var(--primary); letter-spacing: 1.5px; }
 
@@ -93,9 +97,7 @@
       background: transparent; border: none; color: var(--text-muted); font-weight: 600;
       font-size: 0.9rem; cursor: pointer; padding: 8px 14px; border-radius: 20px; transition: var(--transition); white-space: nowrap;
     }
-    .nav-btn:hover, .nav-btn.active {
-      color: var(--primary-dark); background: rgba(255, 255, 255, 0.85); box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    }
+    .nav-btn:hover, .nav-btn.active { color: var(--primary-dark); background: rgba(255, 255, 255, 0.85); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
 
     .btn-pill {
       padding: 9px 18px; border-radius: 30px; font-weight: 700; font-size: 0.88rem;
@@ -111,32 +113,14 @@
 
     .hero-layout { display: grid; grid-template-columns: 1.18fr 0.82fr; gap: 36px; align-items: start; }
     
-    /* TO'G'RILANGAN: Bino rasmi va yozuv yaqinlashtirildi va animatsiya qo'shildi */
-    .hero-header-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start; /* Space-between o'rniga boshiga yig'ildi */
-      gap: 30px; /* Matn va rasm o'rtasidagi aniq va chiroyli masofa */
-      margin-bottom: 28px;
-    }
-    .main-heading { 
-      font-size: 2.6rem; 
-      font-weight: 900; 
-      line-height: 1.15; 
-      color: #0c2b4c; 
-      margin-bottom: 0; 
-    }
+    .hero-header-wrap { display: flex; align-items: center; justify-content: flex-start; gap: 30px; margin-bottom: 28px; }
+    .main-heading { font-size: 2.6rem; font-weight: 900; line-height: 1.15; color: #0c2b4c; margin-bottom: 0; flex: 1; }
     .main-heading span { background: linear-gradient(135deg, #0284c7, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
     .hero-building-img {
-      width: 170px;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 20px;
-      box-shadow: 0 16px 36px rgba(2, 132, 199, 0.15);
-      border: 4px solid #ffffff;
-      flex-shrink: 0;
-      animation: floatBuilding 4s ease-in-out infinite; /* Jonli suzish effekti */
+      width: 170px; height: 150px; object-fit: cover; border-radius: 20px;
+      box-shadow: 0 16px 36px rgba(2, 132, 199, 0.15); border: 4px solid #ffffff;
+      flex-shrink: 0; background-color: #e2e8f0; animation: floatBuilding 4s ease-in-out infinite;
     }
 
     @keyframes floatBuilding {
@@ -240,11 +224,13 @@
     .admin-secret-link:hover { color: var(--cyan); }
 
     /* ========================================================
-       MOBIL VA PLANSHET MOSLASHUVCHANLIGI
+       MOBIL VA PLANSHET MOSLASHUVCHANLIGI (QAT'IY QOTIRILGAN)
        ======================================================== */
     @media (max-width: 1024px) {
-      .hero-layout, .footer-grid { grid-template-columns: 1fr; }
-      .services-grid-dynamic, .doctors-row-dynamic { grid-template-columns: repeat(2, 1fr); }
+      .hero-layout, .footer-grid { display: flex !important; flex-direction: column !important; width: 100%; gap: 24px; }
+      .hero-header-wrap { flex-direction: column; text-align: center; width: 100%; }
+      .main-heading { text-align: center; width: 100%; }
+      .hero-building-img { margin: 0 auto; display: block; }
     }
 
     @media (max-width: 768px) {
@@ -252,7 +238,15 @@
       .top-info-bar { flex-direction: column; text-align: center; gap: 8px; padding: 10px; border-radius: 12px; }
       .hide-mobile { display: none !important; }
       .app-container { transform: none !important; perspective: none !important; transform-style: flat !important; }
-      .main-board { padding: 18px 14px; border-radius: 22px; gap: 16px; transform: none !important; }
+      
+      .main-board { 
+        padding: 16px 12px; 
+        border-radius: 22px; 
+        gap: 16px; 
+        transform: none !important; 
+        width: 100% !important; 
+        max-width: 100% !important;
+      }
       
       .top-bar { display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding-bottom: 14px; }
       .top-bar-header { display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: space-between; width: 100%; gap: 8px; }
@@ -268,13 +262,43 @@
       .nav-pills { display: flex; flex-wrap: nowrap; gap: 6px; width: 100%; justify-content: space-between; }
       .nav-btn { padding: 7px 10px; font-size: 0.78rem; background: rgba(255, 255, 255, 0.7); border-radius: 12px; flex: 1; text-align: center; }
       
-      /* MOBILDA BINO RASMI VA YOZUV TARTIBI (Ketma-ket) */
-      .hero-header-wrap { flex-direction: column; text-align: center; gap: 20px; }
-      .main-heading { font-size: 1.65rem; text-align: center; }
-      .hero-building-img { width: 100%; max-width: 320px; height: 180px; margin: 0 auto; }
+      /* QAT'IY USTMA-UST TARTIB: Yozuv tepada, rasm pastda */
+      .hero-layout > div { width: 100% !important; max-width: 100% !important; min-width: 0 !important; }
       
-      .services-grid-dynamic, .doctors-row-dynamic { grid-template-columns: 1fr; }
-      .lab-check-box, .booking-pod { padding: 16px; border-radius: 18px; }
+      .hero-header-wrap { 
+        display: flex !important;
+        flex-direction: column !important; 
+        align-items: center !important;
+        text-align: center !important; 
+        gap: 16px !important; 
+        width: 100% !important; 
+      }
+      .main-heading { font-size: 1.7rem !important; text-align: center !important; width: 100% !important; line-height: 1.25 !important; }
+      
+      /* Rasm umuman toshib ketmasligi uchun max-width o'rnatildi */
+      .hero-building-img { 
+        width: 100% !important; 
+        max-width: 280px !important; 
+        height: 160px !important; 
+        margin: 0 auto !important; 
+        display: block !important; 
+      }
+      
+      /* KARTALAR UCHUN GORIZONTAL TASMA */
+      .services-grid-dynamic, .doctors-row-dynamic { 
+        display: flex !important; 
+        flex-wrap: nowrap !important; 
+        overflow-x: auto !important; 
+        gap: 12px; 
+        padding-bottom: 12px; 
+        width: 100%;
+        scroll-snap-type: x mandatory; 
+        -webkit-overflow-scrolling: touch; 
+      }
+      .services-grid-dynamic::-webkit-scrollbar, .doctors-row-dynamic::-webkit-scrollbar { display: none; }
+      .diag-card-3d, .doc-item { min-width: 85% !important; max-width: 85% !important; flex-shrink: 0; scroll-snap-align: center; }
+      
+      .lab-check-box, .booking-pod { padding: 16px; border-radius: 18px; width: 100%; }
       .lab-input-container { flex-direction: column; border-radius: 16px; padding: 8px; }
       .lab-input-field { width: 100%; text-align: center; padding: 8px 0; }
       .btn-lab-check { width: 100%; text-align: center; }
@@ -297,7 +321,7 @@
     
     <div class="top-info-bar">
       <div>
-        <span><i data-lucide="map-pin" style="width: 14px;"></i> Toshkent sh., Yashnobod tumani</span>
+        <span><i data-lucide="map-pin" style="width: 14px;"></i> Toshkent sh., Chilonzor tumani</span>
         <span class="hide-mobile"><i data-lucide="clock" style="width: 14px;"></i> Du-Shan: 09:00 - 18:00</span>
       </div>
       <div>
@@ -361,7 +385,7 @@
           </div>
 
           <div class="right-section">
-            
+
             <div class="lab-check-box">
               <div class="lab-check-title">
                 <i data-lucide="file-check-2" style="color: var(--primary);"></i>
@@ -397,7 +421,7 @@
 
               <div style="display: flex; gap: 8px; margin-bottom: 10px;">
                 <input type="text" id="patientName" class="booking-input" placeholder="Ismingiz..." />
-                <input type="tel" id="patientPhone" class="booking-input" placeholder="+998 90 123-45-67" />
+                <input type="tel" id="patientPhone" class="booking-input" placeholder="+998 90 123-45-67" autocomplete="tel" oninput="this.value = this.value.replace(/[^0-9+ ]/g, '')" />
               </div>
 
               <select id="bookingServiceSelect" class="booking-input" style="margin-bottom: 10px;" onchange="updateBookedSlotsUI()"></select>
@@ -1052,6 +1076,43 @@
       document.getElementById('infoModalTitle').innerHTML = title; document.getElementById('infoModalBody').innerHTML = body; document.getElementById('infoModal').style.display = 'flex';
     }
     function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
+
+    // ==========================================
+    // MOBIL QURILMALARDA AVTOMATIK AYLANTIRISH (TICKER) - QOTISH TUZATILDI
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      ['servicesFrontendList', 'doctorsFrontendList'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('touchstart', () => el.dataset.isTouched = 'true', {passive: true});
+          el.addEventListener('touchend', () => setTimeout(() => el.dataset.isTouched = 'false', 3000));
+          el.addEventListener('mouseenter', () => el.dataset.isTouched = 'true');
+          el.addEventListener('mouseleave', () => setTimeout(() => el.dataset.isTouched = 'false', 2000));
+        }
+      });
+    });
+
+    setInterval(() => {
+      if (window.innerWidth > 768) return; 
+      ['servicesFrontendList', 'doctorsFrontendList'].forEach(id => {
+        const container = document.getElementById(id);
+        
+        if (!container || container.children.length <= 1) return;
+        if (container.dataset.isTouched === 'true') return;
+
+        const maxScroll = container.scrollWidth - container.clientWidth;
+        
+        // YANGILIK: Agar yashirin qism 50 pikseldan kam bo'lsa (ya'ni hammasi ekranga sig'sa), umuman qimirlamaydi
+        if (maxScroll <= 50) return; 
+
+        if (container.scrollLeft >= maxScroll - 15) {
+          container.scrollTo({ left: 0, behavior: 'smooth' }); 
+        } else {
+          const cardWidth = container.children[0].offsetWidth + 14; 
+          container.scrollBy({ left: cardWidth, behavior: 'smooth' });
+        }
+      });
+    }, 3500); 
 
     const canvas = document.getElementById('bgCanvas');
     const scene = new THREE.Scene();
