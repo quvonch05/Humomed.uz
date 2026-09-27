@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Humo Med</title>
+  <title>Humo Med — 3D Portal, Admin & TG Bot Tahlillar</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -23,20 +23,18 @@
       --primary: #0284c7;
       --primary-dark: #0369a1;
       --cyan: #38bdf8;
-      --danger: #ef4444;
-      --success: #10b981;
-      --radius-lg: 36px;
       --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; user-select: none; }
+    input, textarea { user-select: text; }
 
     body {
       min-height: 100vh;
       background: var(--bg-gradient);
       color: var(--text-main);
       overflow-x: hidden;
-      padding: 24px 14px;
+      padding: 14px;
     }
 
     #bgCanvas {
@@ -47,18 +45,34 @@
       position: relative; z-index: 10; width: 100%; max-width: 1420px; margin: 0 auto;
     }
 
+    /* YANGI: Klinika ma'lumot satri */
+    .top-info-bar {
+      background: rgba(2, 132, 199, 0.08);
+      border: 1px solid rgba(2, 132, 199, 0.15);
+      border-radius: 16px;
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 14px;
+    }
+    .top-info-bar div { display: flex; align-items: center; gap: 20px; }
+    .top-info-bar span { display: flex; align-items: center; gap: 6px; }
+
     .main-board {
       background: var(--glass-panel);
       backdrop-filter: blur(28px) saturate(190%);
       -webkit-backdrop-filter: blur(28px) saturate(190%);
       border: 2.5px solid var(--glass-border);
-      border-radius: var(--radius-lg);
+      border-radius: 36px;
       padding: 36px 44px;
       box-shadow: var(--glass-shadow);
       display: flex; flex-direction: column; gap: 32px;
     }
 
-    /* Top Bar Desktop */
     .top-bar {
       display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1px solid rgba(255, 255, 255, 0.8); padding-bottom: 20px;
@@ -66,21 +80,20 @@
     }
 
     .top-bar-header {
-      display: flex; align-items: center; justify-content: space-between;
-      width: 100%;
+      display: flex; align-items: center; justify-content: space-between; width: 100%;
     }
 
-    .brand-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; flex-shrink: 0; }
-    .brand-svg { width: 44px; height: 44px; filter: drop-shadow(0 4px 10px rgba(2, 132, 199, 0.35)); }
-    .brand-title { font-size: 1.55rem; font-weight: 800; color: var(--primary-dark); line-height: 1; }
-    .brand-sub { font-size: 0.78rem; font-weight: 700; color: var(--primary); letter-spacing: 1.5px; }
+    /* Haqiqiy logotip dizayni */
+    .brand-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; flex-shrink: 0; }
+    .brand-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--cyan); box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25); }
+    .brand-title { font-size: 1.6rem; font-weight: 900; color: var(--primary-dark); line-height: 1; }
+    .brand-sub { font-size: 0.75rem; font-weight: 800; color: var(--primary); letter-spacing: 1.5px; }
 
     .nav-wrapper { display: flex; align-items: center; gap: 8px; }
     .nav-pills { display: flex; align-items: center; gap: 6px; list-style: none; }
     .nav-btn {
       background: transparent; border: none; color: var(--text-muted); font-weight: 600;
-      font-size: 0.9rem; cursor: pointer; padding: 8px 14px; border-radius: 20px; transition: var(--transition);
-      white-space: nowrap;
+      font-size: 0.9rem; cursor: pointer; padding: 8px 14px; border-radius: 20px; transition: var(--transition); white-space: nowrap;
     }
     .nav-btn:hover, .nav-btn.active {
       color: var(--primary-dark); background: rgba(255, 255, 255, 0.85); box-shadow: 0 4px 12px rgba(0,0,0,0.03);
@@ -88,8 +101,7 @@
 
     .btn-pill {
       padding: 9px 18px; border-radius: 30px; font-weight: 700; font-size: 0.88rem;
-      border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: var(--transition);
-      white-space: nowrap; flex-shrink: 0;
+      border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: var(--transition); white-space: nowrap; flex-shrink: 0;
     }
     .btn-pill-cyan { background: linear-gradient(135deg, #bae6fd 0%, #7dd3fc 100%); color: #0369a1; }
     .btn-pill-blue { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35); }
@@ -107,18 +119,13 @@
     .services-grid-dynamic { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
     .diag-card-3d {
       background: linear-gradient(145deg, #ffffff 40%, #e6f2fc 100%);
-      padding: 16px 14px; border-radius: 20px;
-      box-shadow: 0 12px 24px rgba(2, 132, 199, 0.1), -3px -3px 8px rgba(255, 255, 255, 0.9) inset;
-      border: 1.5px solid rgba(255, 255, 255, 0.9);
-      display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; transition: var(--transition);
+      padding: 16px 14px; border-radius: 20px; box-shadow: 0 12px 24px rgba(2, 132, 199, 0.1), -3px -3px 8px rgba(255, 255, 255, 0.9) inset;
+      border: 1.5px solid rgba(255, 255, 255, 0.9); display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; transition: var(--transition);
     }
     .diag-card-3d:hover { transform: translateY(-5px) scale(1.02); border-color: var(--cyan); }
-
     .diag-icon-sphere {
-      width: 62px; height: 62px; border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #cce7fe 60%, #8ac3fc 100%);
-      display: flex; align-items: center; justify-content: center; color: var(--primary);
-      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.22); margin-bottom: 10px; overflow: hidden; border: 2px solid #ffffff; flex-shrink: 0;
+      width: 62px; height: 62px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffffff 0%, #cce7fe 60%, #8ac3fc 100%);
+      display: flex; align-items: center; justify-content: center; color: var(--primary); box-shadow: 0 6px 16px rgba(2, 132, 199, 0.22); margin-bottom: 10px; overflow: hidden; border: 2px solid #ffffff; flex-shrink: 0;
     }
     .diag-icon-sphere img { width: 100%; height: 100%; object-fit: cover; }
     .diag-card-3d h4 { font-size: 0.88rem; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
@@ -127,49 +134,31 @@
 
     .doctors-row-dynamic { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
     .doc-item {
-      background: rgba(255, 255, 255, 0.85); padding: 12px 14px; border-radius: 18px;
-      display: flex; align-items: center; gap: 10px; border: 1px solid #ffffff; box-shadow: 0 5px 14px rgba(0, 0, 0, 0.03); cursor: pointer; transition: var(--transition);
+      background: rgba(255, 255, 255, 0.85); padding: 12px 14px; border-radius: 18px; border: 1px solid #ffffff; box-shadow: 0 5px 14px rgba(0, 0, 0, 0.03); cursor: pointer; transition: var(--transition);
+      display: flex; align-items: center; gap: 10px;
     }
     .doc-item:hover { background: #ffffff; transform: translateY(-3px); box-shadow: 0 8px 18px rgba(2, 132, 199, 0.15); }
     .doc-avatar-3d {
-      width: 42px; height: 42px; min-width: 42px; border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #ffedd5 10%, #fb923c 100%);
-      display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
+      width: 42px; height: 42px; min-width: 42px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #ffedd5 10%, #fb923c 100%); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
     }
 
     .right-section { display: flex; flex-direction: column; gap: 20px; }
-    .lab-check-box {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, #e0f2fe 100%);
-      border: 2px solid #ffffff; border-radius: 26px; padding: 22px; box-shadow: 0 16px 36px rgba(2, 132, 199, 0.12);
-    }
+    .lab-check-box { background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, #e0f2fe 100%); border: 2px solid #ffffff; border-radius: 26px; padding: 22px; box-shadow: 0 16px 36px rgba(2, 132, 199, 0.12); }
     .lab-check-title { font-size: 1.28rem; font-weight: 800; color: #0c2b4c; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-    .lab-input-container {
-      background: #ffffff; border: 1.5px solid #bae6fd; border-radius: 30px;
-      padding: 4px 6px 4px 18px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.06); transition: var(--transition);
-    }
+    .lab-input-container { background: #ffffff; border: 1.5px solid #bae6fd; border-radius: 30px; padding: 4px 6px 4px 18px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.06); transition: var(--transition); }
     .lab-input-container:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2); }
     .lab-input-field { border: none; outline: none; width: 100%; font-size: 0.95rem; font-weight: 700; color: #0369a1; text-transform: uppercase; background: transparent; }
-    .btn-lab-check {
-      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; border: none;
-      padding: 10px 22px; border-radius: 24px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: var(--transition); white-space: nowrap;
-    }
+    .btn-lab-check { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; border: none; padding: 10px 22px; border-radius: 24px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: var(--transition); white-space: nowrap; }
     .btn-lab-check:hover { transform: scale(1.03); filter: brightness(1.1); }
 
     .booking-pod { background: #ffffff; border-radius: 26px; padding: 22px; box-shadow: 0 16px 34px rgba(15, 23, 42, 0.06); }
-    .booking-input, .admin-input {
-      width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1;
-      font-size: 0.85rem; outline: none; transition: var(--transition); background: #f8fafc;
-    }
+    .booking-input, .admin-input { width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.85rem; outline: none; transition: var(--transition); background: #f8fafc; }
     .booking-input:focus, .admin-input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); }
-
+    
     .cal-header-bar { display: flex; justify-content: space-between; align-items: center; margin: 10px 0 8px; padding: 0 4px; }
     .cal-month-title { font-size: 0.88rem; font-weight: 800; color: #0f3460; }
-    .cal-nav-btn {
-      background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 8px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #334155;
-    }
+    .cal-nav-btn { background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #334155; }
     .cal-nav-btn:hover { background: var(--primary); color: #fff; }
-
     .cal-grid-full { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-bottom: 12px; }
     .cal-weekday { font-size: 0.68rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; padding-bottom: 4px; }
     .cal-day-cell { padding: 6px 0; border-radius: 8px; cursor: pointer; background: #f8fafc; font-size: 0.76rem; font-weight: 700; color: #334155; }
@@ -182,51 +171,32 @@
     .slot-btn { padding: 7px; font-size: 0.76rem; font-weight: 700; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; }
     .slot-btn.active { background: var(--cyan); color: #fff; border-color: var(--cyan); }
     .slot-btn.booked { background: #fee2e2 !important; border-color: #fca5a5 !important; color: #991b1b !important; text-decoration: line-through; cursor: not-allowed; opacity: 0.7; }
-
     .custom-time-box { display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 6px 10px; border-radius: 10px; border: 1px solid #e2e8f0; }
     .custom-time-box label { font-size: 0.75rem; font-weight: 700; color: #475569; white-space: nowrap; }
     .custom-time-input { border: none; background: transparent; font-weight: 700; color: var(--primary-dark); font-size: 0.85rem; outline: none; cursor: pointer; }
 
-    .btn-submit-3d {
-      width: 100%; background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%); color: #ffffff;
-      padding: 12px; border-radius: 14px; font-weight: 800; font-size: 0.92rem; border: none; cursor: pointer;
-      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3); transition: var(--transition);
-    }
+    .btn-submit-3d { width: 100%; background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%); color: #ffffff; padding: 12px; border-radius: 14px; font-weight: 800; font-size: 0.92rem; border: none; cursor: pointer; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3); transition: var(--transition); }
     .btn-submit-3d:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(2, 132, 199, 0.4); }
 
     .admin-dashboard { background: rgba(255, 255, 255, 0.95); border-radius: 28px; padding: 28px; border: 1px solid #ffffff; }
     .admin-nav { display: flex; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-    .admin-tab-btn {
-      background: none; border: none; font-size: 0.9rem; font-weight: 700; color: var(--text-muted);
-      cursor: pointer; padding: 8px 16px; border-radius: 10px; display: flex; align-items: center; gap: 8px;
-    }
+    .admin-tab-btn { background: none; border: none; font-size: 0.9rem; font-weight: 700; color: var(--text-muted); cursor: pointer; padding: 8px 16px; border-radius: 10px; display: flex; align-items: center; gap: 8px; }
     .admin-tab-btn.active { color: var(--primary-dark); background: #e0f2fe; }
     .admin-section { display: none; }
     .admin-section.active { display: block; }
-
     .admin-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 0.85rem; }
     .admin-table th, .admin-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e2e8f0; }
     .admin-table th { background: #f8fafc; font-weight: 800; }
-
     .action-btn { padding: 6px 12px; border-radius: 8px; border: none; font-weight: 700; font-size: 0.75rem; cursor: pointer; }
     .btn-edit { background: #e0f2fe; color: #0369a1; margin-right: 4px; }
     .btn-delete { background: #fee2e2; color: #b91c1c; }
     .btn-add { background: var(--primary); color: #fff; padding: 10px 18px; border-radius: 10px; font-weight: 700; border: none; cursor: pointer; }
 
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px;
-    }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
     .modal-box { background: #ffffff; width: 100%; max-width: 500px; border-radius: 24px; padding: 28px; position: relative; }
-    .modal-close {
-      position: absolute; top: 18px; right: 18px; background: #f1f5f9; border: none;
-      width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    }
+    .modal-close { position: absolute; top: 18px; right: 18px; background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-    .preview-sphere {
-      width: 70px; height: 70px; border-radius: 50%; background: #f1f5f9; border: 2px dashed #94a3b8;
-      display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 8px 0 14px;
-    }
+    .preview-sphere { width: 70px; height: 70px; border-radius: 50%; background: #f1f5f9; border: 2px dashed #94a3b8; display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 8px 0 14px; }
     .preview-sphere img { width: 100%; height: 100%; object-fit: cover; }
 
     footer { background: #090e17; color: #94a3b8; border-radius: 26px; padding: 36px 30px 20px; margin-top: 30px; }
@@ -235,181 +205,50 @@
     .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; }
     .footer-col a { color: #94a3b8; text-decoration: none; }
     .footer-col a:hover { color: #38bdf8; }
-
-    .admin-secret-link {
-      color: #475569;
-      text-decoration: none;
-      font-size: 0.75rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: var(--transition);
-    }
+    .admin-secret-link { color: #475569; text-decoration: none; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: var(--transition); }
     .admin-secret-link:hover { color: var(--cyan); }
 
-    /* ========================================================
-       MOBIL VA PLANSHET MOSLASHUVCHANLIGI (RESPONSIVE)
-       ======================================================== */
+    /* MOSLASHUVCHANLIK (RESPONSIVE) */
     @media (max-width: 1024px) {
       .hero-layout, .footer-grid { grid-template-columns: 1fr; }
       .services-grid-dynamic, .doctors-row-dynamic { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 768px) {
-      body {
-        padding: 10px 8px;
-        perspective: none !important;
-      }
-
-      /* 3D effektlarni to'liq o'chirish */
-      .app-container {
-        transform: none !important;
-        perspective: none !important;
-        transform-style: flat !important;
-      }
-
-      .main-board {
-        padding: 18px 14px;
-        border-radius: 22px;
-        gap: 16px;
-        transform: none !important;
-      }
-
-      /* Tepa qism: logotip va tugmani doim bitta qatorda saqlaydi */
-      .top-bar {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        padding-bottom: 14px;
-      }
-
-      .top-bar-header {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap; /* TUGMA PASTGA TUSHIB KETMASLIGI UCHUN */
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        gap: 8px;
-      }
-
-      /* Logotip ixchamlashadi, yoniga tugma sig'ishi uchun */
-      .brand-title { font-size: 1.25rem; }
+      body { padding: 8px; perspective: none !important; }
+      .top-info-bar { flex-direction: column; text-align: center; gap: 8px; padding: 10px; border-radius: 12px; }
+      .hide-mobile { display: none !important; }
+      .app-container { transform: none !important; perspective: none !important; transform-style: flat !important; }
+      .main-board { padding: 18px 14px; border-radius: 22px; gap: 16px; transform: none !important; }
+      
+      .top-bar { display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding-bottom: 14px; }
+      .top-bar-header { display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: space-between; width: 100%; gap: 8px; }
+      
+      .brand-title { font-size: 1.3rem; }
       .brand-sub { font-size: 0.65rem; }
-      .brand-svg { width: 34px; height: 34px; }
-      .brand-logo { gap: 6px; }
-
-      .top-bar-header .btn-pill-cyan {
-        padding: 6px 12px;
-        font-size: 0.75rem;
-        white-space: nowrap;
-        flex-shrink: 0; /* Tugma qisilmasin */
-        width: auto !important; /* To'liq ekran bo'lib ketmasin */
-        transform: none !important;
-      }
-
-      /* 4 ta menyu bo'limi - gorizontal tekis qator */
-      .nav-wrapper {
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 4px;
-      }
+      .brand-img { width: 38px; height: 38px; }
+      
+      .top-bar-header .btn-pill-cyan { padding: 6px 12px; font-size: 0.75rem; white-space: nowrap; flex-shrink: 0; width: auto !important; transform: none !important; }
+      
+      .nav-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
       .nav-wrapper::-webkit-scrollbar { display: none; }
-
-      .nav-pills {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: 6px;
-        width: 100%;
-        justify-content: space-between;
-      }
-
-      .nav-btn {
-        padding: 7px 10px;
-        font-size: 0.78rem;
-        background: rgba(255, 255, 255, 0.7);
-        border-radius: 12px;
-        flex: 1;
-        text-align: center;
-      }
-
-      .main-heading {
-        font-size: 1.65rem;
-        line-height: 1.25;
-        margin-bottom: 16px;
-        text-align: center;
-      }
-
-      .services-grid-dynamic, .doctors-row-dynamic {
-        grid-template-columns: 1fr;
-      }
-
-      .lab-check-box, .booking-pod {
-        padding: 16px;
-        border-radius: 18px;
-      }
-
-      .lab-input-container {
-        flex-direction: column;
-        border-radius: 16px;
-        padding: 8px;
-      }
-
-      .lab-input-field {
-        width: 100%;
-        text-align: center;
-        padding: 8px 0;
-      }
-
-      .btn-lab-check {
-        width: 100%;
-        text-align: center;
-      }
-
-      #bookingBox > div[style*="display: flex; gap: 8px;"] {
-        flex-direction: column !important;
-        gap: 10px !important;
-      }
-
-      .time-slots {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .admin-dashboard {
-        padding: 16px 12px;
-        border-radius: 18px;
-      }
-
-      .admin-nav {
-        overflow-x: auto;
-        white-space: nowrap;
-        flex-wrap: nowrap;
-        padding-bottom: 8px;
-      }
+      .nav-pills { display: flex; flex-wrap: nowrap; gap: 6px; width: 100%; justify-content: space-between; }
+      .nav-btn { padding: 7px 10px; font-size: 0.78rem; background: rgba(255, 255, 255, 0.7); border-radius: 12px; flex: 1; text-align: center; }
+      
+      .main-heading { font-size: 1.65rem; line-height: 1.25; margin-bottom: 16px; text-align: center; }
+      .services-grid-dynamic, .doctors-row-dynamic { grid-template-columns: 1fr; }
+      .lab-check-box, .booking-pod { padding: 16px; border-radius: 18px; }
+      .lab-input-container { flex-direction: column; border-radius: 16px; padding: 8px; }
+      .lab-input-field { width: 100%; text-align: center; padding: 8px 0; }
+      .btn-lab-check { width: 100%; text-align: center; }
+      #bookingBox > div[style*="display: flex; gap: 8px;"] { flex-direction: column !important; gap: 10px !important; }
+      .time-slots { grid-template-columns: repeat(2, 1fr); }
+      .admin-dashboard { padding: 16px 12px; border-radius: 18px; }
+      .admin-nav { overflow-x: auto; white-space: nowrap; flex-wrap: nowrap; padding-bottom: 8px; }
       .admin-nav::-webkit-scrollbar { display: none; }
-
-      .admin-tab-btn {
-        flex-shrink: 0;
-        font-size: 0.8rem;
-        padding: 6px 12px;
-      }
-
-      .admin-table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .modal-box {
-        padding: 20px 16px;
-        max-height: 90vh;
-        overflow-y: auto;
-        border-radius: 18px;
-      }
+      .admin-tab-btn { flex-shrink: 0; font-size: 0.8rem; padding: 6px 12px; }
+      .admin-table { display: block; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+      .modal-box { padding: 20px 16px; max-height: 90vh; overflow-y: auto; border-radius: 18px; }
     }
   </style>
 </head>
@@ -418,22 +257,27 @@
   <canvas id="bgCanvas"></canvas>
 
   <div class="app-container" id="boardContainer">
+    
+    <!-- YANGI: KLINIKA MA'LUMOT SATRI -->
+    <div class="top-info-bar">
+      <div>
+        <span><i data-lucide="map-pin" style="width: 14px;"></i> Toshkent sh., Chilonzor tumani</span>
+        <span class="hide-mobile"><i data-lucide="clock" style="width: 14px;"></i> Du-Shan: 09:00 - 18:00</span>
+      </div>
+      <div>
+        <span><i data-lucide="phone" style="width: 14px;"></i> +998 71 200 00 00</span>
+        <span class="hide-mobile"><i data-lucide="mail" style="width: 14px;"></i> info@humomed.uz</span>
+      </div>
+    </div>
+
     <div class="main-board">
 
       <!-- TOP NAVBAR -->
       <div class="top-bar">
         <div class="top-bar-header">
           <div class="brand-logo" onclick="switchNavView('home')">
-            <svg class="brand-svg" viewBox="0 0 100 100" fill="none">
-              <path d="M15 50 Q30 20 60 25 T85 50 T60 75 T15 50" fill="url(#hGrad)" />
-              <path d="M20 52 L38 52 L45 35 L55 68 L64 45 L72 52 L80 52" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-              <defs>
-                <linearGradient id="hGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#0288d1" />
-                  <stop offset="1" stop-color="#38bdf8" />
-                </linearGradient>
-              </defs>
-            </svg>
+            <!-- YANGI: HAQIQIY LOGOTIP JOYLASHDI -->
+            <img src="humo_logo.jpg" alt="Humo Logo" class="brand-img" />
             <div>
               <div class="brand-title">Humo</div>
               <div class="brand-sub">MED KLINIKASI</div>
@@ -575,7 +419,6 @@
               </ul>
             </div>
           </div>
-          <!-- Qulay va ko'zga tashlanmaydigan Admin kirish tugmasi -->
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; padding-top: 20px; flex-wrap: wrap; gap: 10px;">
             <div>&copy; 2026 Humo Med. Barcha huquqlar himoyalangan.</div>
             <a class="admin-secret-link" onclick="handleAdminClick()"><i data-lucide="lock" style="width: 13px;"></i> Xodimlar kirishi</a>
@@ -595,7 +438,7 @@
         </div>
       </div>
 
-      <!-- 3. XIZMATLAR VA SHIFOKORLAR FULL VIEW -->
+      <!-- 3. XIZMATLAR VA SHIFOKORLAR -->
       <div id="view-services" class="view-content">
         <h2 style="font-size: 1.8rem; font-weight: 800; color: #0c2b4c; margin-bottom: 16px;">Klinika Diagnostika va Xizmatlari</h2>
         <div class="services-grid-dynamic" id="allServicesFullList"></div>
@@ -620,18 +463,12 @@
           </div>
 
           <div class="admin-nav">
-            <button class="admin-tab-btn active" onclick="switchAdminSection('sec-lab')">
-              <i data-lucide="file-spreadsheet" style="width: 18px;"></i> TG Bot & Tahlillar Bazasi
-            </button>
-            <button class="admin-tab-btn" onclick="switchAdminSection('sec-services')">
-              <i data-lucide="layers" style="width: 18px;"></i> Xizmatlar
-            </button>
-            <button class="admin-tab-btn" onclick="switchAdminSection('sec-doctors')">
-              <i data-lucide="users" style="width: 18px;"></i> Shifokorlar
-            </button>
-            <button class="admin-tab-btn" onclick="switchAdminSection('sec-bookings')">
-              <i data-lucide="inbox" style="width: 18px;"></i> Navbatlar
-            </button>
+            <button class="admin-tab-btn active" onclick="switchAdminSection('sec-lab')"><i data-lucide="file-spreadsheet" style="width: 18px;"></i> Tahlillar</button>
+            <button class="admin-tab-btn" onclick="switchAdminSection('sec-services')"><i data-lucide="layers" style="width: 18px;"></i> Xizmatlar</button>
+            <button class="admin-tab-btn" onclick="switchAdminSection('sec-doctors')"><i data-lucide="users" style="width: 18px;"></i> Shifokorlar</button>
+            <button class="admin-tab-btn" onclick="switchAdminSection('sec-bookings')"><i data-lucide="inbox" style="width: 18px;"></i> Navbatlar</button>
+            <!-- YANGI: PAROL O'ZGARTIRISH BO'LIMI -->
+            <button class="admin-tab-btn" onclick="switchAdminSection('sec-settings')"><i data-lucide="settings" style="width: 18px;"></i> Sozlamalar</button>
           </div>
 
           <div id="sec-lab" class="admin-section active">
@@ -645,19 +482,8 @@
                 <button class="btn-add" onclick="openLabModalNew()">+ Qo‘lda Tahlil Qo‘shish</button>
               </div>
             </div>
-
             <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>Tahlil Kodi</th>
-                  <th>Bemor</th>
-                  <th>Tahlil Turi</th>
-                  <th>Shifokor</th>
-                  <th>Sana</th>
-                  <th>Fayl</th>
-                  <th>Amal</th>
-                </tr>
-              </thead>
+              <thead><tr><th>Tahlil Kodi</th><th>Bemor</th><th>Tahlil Turi</th><th>Shifokor</th><th>Sana</th><th>Fayl</th><th>Amal</th></tr></thead>
               <tbody id="adminLabTable"></tbody>
             </table>
           </div>
@@ -668,15 +494,7 @@
               <button class="btn-add" onclick="openServiceModal()">+ Yangi Xizmat</button>
             </div>
             <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>Rasm</th>
-                  <th>Xizmat Nomi</th>
-                  <th>Tavsif</th>
-                  <th>Narxi</th>
-                  <th>Amallar</th>
-                </tr>
-              </thead>
+              <thead><tr><th>Rasm</th><th>Xizmat Nomi</th><th>Tavsif</th><th>Narxi</th><th>Amallar</th></tr></thead>
               <tbody id="adminServicesTable"></tbody>
             </table>
           </div>
@@ -687,14 +505,7 @@
               <button class="btn-add" onclick="openDoctorModal()">+ Yangi Shifokor</button>
             </div>
             <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>F.I.SH</th>
-                  <th>Mutaxassislik</th>
-                  <th>Tajriba</th>
-                  <th>Amallar</th>
-                </tr>
-              </thead>
+              <thead><tr><th>F.I.SH</th><th>Mutaxassislik</th><th>Tajriba</th><th>Amallar</th></tr></thead>
               <tbody id="adminDoctorsTable"></tbody>
             </table>
           </div>
@@ -702,17 +513,26 @@
           <div id="sec-bookings" class="admin-section">
             <h3 style="font-size: 1.1rem; color: #1e293b; margin-bottom: 10px;">Band Qilingan Navbatlar</h3>
             <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>Bemor</th>
-                  <th>Telefon</th>
-                  <th>Xizmat</th>
-                  <th>Sana & Vaqt</th>
-                  <th>Amal</th>
-                </tr>
-              </thead>
+              <thead><tr><th>Bemor</th><th>Telefon</th><th>Xizmat</th><th>Sana & Vaqt</th><th>Amal</th></tr></thead>
               <tbody id="adminBookingsTable"></tbody>
             </table>
+          </div>
+
+          <!-- YANGI: SOZLAMALAR VA PAROL ALMASHTIRISH -->
+          <div id="sec-settings" class="admin-section">
+            <h3 style="font-size: 1.1rem; color: #1e293b; margin-bottom: 12px;">Xavfsizlik va Parolni o'zgartirish</h3>
+            <div style="background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; max-width: 400px;">
+              <label style="font-size: 0.8rem; font-weight: 700;">Joriy parol:</label>
+              <input type="password" id="oldAdminPass" class="admin-input" style="margin-bottom: 14px;" placeholder="Hozirgi parolni kiriting">
+              
+              <label style="font-size: 0.8rem; font-weight: 700;">Yangi Login:</label>
+              <input type="text" id="newAdminLogin" class="admin-input" style="margin-bottom: 14px;" placeholder="Yangi login nomi">
+              
+              <label style="font-size: 0.8rem; font-weight: 700;">Yangi Parol:</label>
+              <input type="password" id="newAdminPass" class="admin-input" style="margin-bottom: 16px;" placeholder="Yangi parol">
+              
+              <button class="btn-submit-3d" onclick="updateAdminAuth()">Ma'lumotlarni Yangilash</button>
+            </div>
           </div>
         </div>
       </div>
@@ -736,7 +556,6 @@
         </div>
         <button type="submit" class="btn-submit-3d">Tizimga Kirish</button>
       </form>
-      <p style="font-size: 0.75rem; color: #64748b; margin-top: 10px; text-align: center;">Standart: <b>admin</b> | <b>humo2026</b></p>
     </div>
   </div>
 
@@ -745,30 +564,12 @@
       <button class="modal-close" onclick="closeModals()"><i data-lucide="x" style="width: 16px;"></i></button>
       <h3 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 14px;">Yangi Tahlil Natijasini Joylash</h3>
       <input type="hidden" id="editLabId" />
-      <div style="margin-bottom: 10px;">
-        <label style="font-size: 0.8rem; font-weight: 700;">Tahlil Kodi</label>
-        <input type="text" id="labCodeInputModal" class="admin-input" placeholder="HM-0077" style="text-transform: uppercase;" />
-      </div>
-      <div style="margin-bottom: 10px;">
-        <label style="font-size: 0.8rem; font-weight: 700;">Bemor F.I.SH</label>
-        <input type="text" id="labPatientModal" class="admin-input" placeholder="Sardor Aliyev" />
-      </div>
-      <div style="margin-bottom: 10px;">
-        <label style="font-size: 0.8rem; font-weight: 700;">Tahlil Yo‘nalishi</label>
-        <input type="text" id="labTypeModal" class="admin-input" placeholder="Biokimyoviy qon tahlili" />
-      </div>
-      <div style="margin-bottom: 10px;">
-        <label style="font-size: 0.8rem; font-weight: 700;">Mas'ul Shifokor</label>
-        <input type="text" id="labDoctorModal" class="admin-input" placeholder="Dr. Jasur Aliyev" />
-      </div>
-      <div style="margin-bottom: 10px;">
-        <label style="font-size: 0.8rem; font-weight: 700;">Tibbiy Xulosa</label>
-        <textarea id="labSummaryModal" class="admin-input" style="height: 60px; resize: none;" placeholder="Barcha me'yorlar doirasida..."></textarea>
-      </div>
-      <div style="margin-bottom: 16px;">
-        <label style="font-size: 0.8rem; font-weight: 700;">Natija Fayli (PDF/Rasm havolasi):</label>
-        <input type="text" id="labResultFileUrl" class="admin-input" placeholder="https://... fayl havolasi" />
-      </div>
+      <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Tahlil Kodi</label><input type="text" id="labCodeInputModal" class="admin-input" placeholder="HM-0077" style="text-transform: uppercase;" /></div>
+      <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Bemor F.I.SH</label><input type="text" id="labPatientModal" class="admin-input" placeholder="Sardor Aliyev" /></div>
+      <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Tahlil Yo‘nalishi</label><input type="text" id="labTypeModal" class="admin-input" placeholder="Biokimyoviy qon tahlili" /></div>
+      <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Mas'ul Shifokor</label><input type="text" id="labDoctorModal" class="admin-input" placeholder="Dr. Jasur Aliyev" /></div>
+      <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Tibbiy Xulosa</label><textarea id="labSummaryModal" class="admin-input" style="height: 60px; resize: none;" placeholder="Barcha me'yorlar doirasida..."></textarea></div>
+      <div style="margin-bottom: 16px;"><label style="font-size: 0.8rem; font-weight: 700;">Natija Fayli (PDF/Rasm havolasi):</label><input type="text" id="labResultFileUrl" class="admin-input" placeholder="https://... fayl havolasi" /></div>
       <button class="btn-submit-3d" onclick="saveLabResult()">Serverga Saqlash</button>
     </div>
   </div>
@@ -778,26 +579,11 @@
       <button class="modal-close" onclick="closeModals()"><i data-lucide="x" style="width: 16px;"></i></button>
       <h3 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 14px;" id="serviceModalTitle">Xizmat Qo‘shish</h3>
       <input type="hidden" id="editServiceId" />
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        <label style="font-size: 0.8rem; font-weight: 700;">Ramkachadagi Rasm</label>
-        <div class="preview-sphere" id="imgPreviewSphere"><i data-lucide="scan" style="color:var(--primary); width:28px; height:28px;"></i></div>
-      </div>
-      <div style="margin-bottom: 10px;">
-        <label style="font-size: 0.78rem; font-weight: 700;">Rasm URL havolasi:</label>
-        <input type="url" id="serviceImageUrl" class="admin-input" placeholder="https://..." oninput="updatePreviewSphere(this.value)" />
-      </div>
-      <div style="margin-bottom: 10px;">
-        <label style="font-size: 0.8rem; font-weight: 700;">Xizmat Nomi</label>
-        <input type="text" id="serviceNameInput" class="admin-input" placeholder="Masalan: MRT Diagnostika" />
-      </div>
-      <div style="margin-bottom: 10px;">
-        <label style="font-size: 0.8rem; font-weight: 700;">Tavsif</label>
-        <input type="text" id="serviceDescInput" class="admin-input" placeholder="Qisqacha tavsif..." />
-      </div>
-      <div style="margin-bottom: 16px;">
-        <label style="font-size: 0.8rem; font-weight: 700;">Narxi</label>
-        <input type="text" id="servicePriceInput" class="admin-input" placeholder="Masalan: 380,000 so‘m" />
-      </div>
+      <div style="display: flex; flex-direction: column; align-items: center;"><label style="font-size: 0.8rem; font-weight: 700;">Ramkachadagi Rasm</label><div class="preview-sphere" id="imgPreviewSphere"><i data-lucide="scan" style="color:var(--primary); width:28px; height:28px;"></i></div></div>
+      <div style="margin-bottom: 10px;"><label style="font-size: 0.78rem; font-weight: 700;">Rasm URL havolasi:</label><input type="url" id="serviceImageUrl" class="admin-input" placeholder="https://..." oninput="updatePreviewSphere(this.value)" /></div>
+      <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Xizmat Nomi</label><input type="text" id="serviceNameInput" class="admin-input" placeholder="Masalan: MRT Diagnostika" /></div>
+      <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Tavsif</label><input type="text" id="serviceDescInput" class="admin-input" placeholder="Qisqacha tavsif..." /></div>
+      <div style="margin-bottom: 16px;"><label style="font-size: 0.8rem; font-weight: 700;">Narxi</label><input type="text" id="servicePriceInput" class="admin-input" placeholder="Masalan: 380,000 so‘m" /></div>
       <button class="btn-submit-3d" onclick="saveService()">Serverga Saqlash</button>
     </div>
   </div>
@@ -807,18 +593,9 @@
       <button class="modal-close" onclick="closeModals()"><i data-lucide="x" style="width: 16px;"></i></button>
       <h3 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 14px;" id="doctorModalTitle">Shifokor Qo‘shish</h3>
       <input type="hidden" id="editDoctorId" />
-      <div style="margin-bottom: 10px;">
-        <label style="font-size: 0.8rem; font-weight: 700;">Ism-familiya</label>
-        <input type="text" id="docNameInput" class="admin-input" placeholder="Dr. Jasur Aliyev" />
-      </div>
-      <div style="margin-bottom: 10px;">
-        <label style="font-size: 0.8rem; font-weight: 700;">Mutaxassislik</label>
-        <input type="text" id="docSpecialtyInput" class="admin-input" placeholder="Bosh Kardiolog" />
-      </div>
-      <div style="margin-bottom: 16px;">
-        <label style="font-size: 0.8rem; font-weight: 700;">Tajriba</label>
-        <input type="text" id="docExpInput" class="admin-input" placeholder="14 yil" />
-      </div>
+      <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Ism-familiya</label><input type="text" id="docNameInput" class="admin-input" placeholder="Dr. Jasur Aliyev" /></div>
+      <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Mutaxassislik</label><input type="text" id="docSpecialtyInput" class="admin-input" placeholder="Bosh Kardiolog" /></div>
+      <div style="margin-bottom: 16px;"><label style="font-size: 0.8rem; font-weight: 700;">Tajriba</label><input type="text" id="docExpInput" class="admin-input" placeholder="14 yil" /></div>
       <button class="btn-submit-3d" onclick="saveDoctor()">Serverga Saqlash</button>
     </div>
   </div>
@@ -832,16 +609,28 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT VA SERVER SINXRONIZATSIYA -->
   <script>
-    const API_BASE_URL = "https://humomed-uz.onrender.com";
-
-    let DB = {
-      services: [],
-      doctors: [],
-      bookings: [],
-      lab_results: {}
+    // ==========================================
+    // 1. HACKERLARDAN HIMOYA (ANTI-XSS, ANTI-INSPECT)
+    // ==========================================
+    document.addEventListener('contextmenu', event => event.preventDefault()); // O'ng tugmani yopish
+    document.onkeydown = function(e) {
+      if(e.keyCode == 123) return false; // F12 yopish
+      if(e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) return false; // Ctrl+Shift+I/J/C
+      if(e.ctrlKey && e.keyCode == 85) return false; // Ctrl+U (Source code)
     };
+
+    // Zararli skriptlarni (XSS) matndan tozalovchi himoya funksiyasi
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>'"]/g, match => {
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
+        return map[match];
+      });
+    }
+
+    const API_BASE_URL = "https://humomed-uz.onrender.com";
+    let DB = { services: [], doctors: [], bookings: [], lab_results: {}, auth: { user: 'admin', pass: 'humo2026' } };
 
     async function fetchFullDatabaseFromServer() {
       try {
@@ -864,120 +653,62 @@
 
     async function syncSectionToServer(sectionName, sectionData) {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/update/${sectionName}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(sectionData)
+        await fetch(`${API_BASE_URL}/api/update/${sectionName}`, {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(sectionData)
         });
-        if (res.ok) {
-          fetchFullDatabaseFromServer();
-        }
+        fetchFullDatabaseFromServer();
       } catch (e) {
-        alert("⚠️ Render serveriga yuborishda xatolik yuz berdi.");
+        console.error("Yuborishda xatolik yuz berdi.");
       }
     }
 
     async function executeLabCheck(customInputId = null) {
-      let inputElem = null;
-      if (customInputId) {
-        inputElem = document.getElementById(customInputId);
-      } else {
-        inputElem = document.getElementById('directLabInput') || document.getElementById('fullViewLabInput');
-      }
-
+      let inputElem = customInputId ? document.getElementById(customInputId) : (document.getElementById('directLabInput') || document.getElementById('fullViewLabInput'));
       if (!inputElem || !inputElem.value.trim()) {
         showInfoModal("Eslatma", "Iltimos, tahlil chekingizdagi kodni kiriting (Masalan: HM-0077)");
         return;
       }
-
-      const searchCode = inputElem.value.trim().toUpperCase().replace(/\s+/g, '');
-      showInfoModal("Qidirilmoqda 🔍", `<p style="color:#64748b;">Markaziy serverdan <b>${searchCode}</b> tahlili yuklanmoqda...</p>`);
+      // Kod faqat harf va raqamdan iborat bo'lishini ta'minlash (himoya)
+      const searchCode = inputElem.value.trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
+      showInfoModal("Qidirilmoqda 🔍", `<p style="color:#64748b;">Markaziy serverdan <b>${escapeHTML(searchCode)}</b> tahlili yuklanmoqda...</p>`);
 
       try {
         const res = await fetch(`${API_BASE_URL}/api/results/${encodeURIComponent(searchCode)}?_=${Date.now()}`);
         if (res.ok) {
           const json = await res.json();
-          if (json && json.data) {
-            renderFoundLab(json.data);
-            return;
-          }
+          if (json && json.data) return renderFoundLab(json.data);
         }
-      } catch (err) {
-        console.warn("Alohida qidiruvda xatolik:", err);
-      }
+      } catch (err) {}
 
       try {
         const fullRes = await fetch(`${API_BASE_URL}/api/db?_=${Date.now()}`);
         if (fullRes.ok) {
-          const liveDB = await fullRes.json();
-          DB = liveDB;
+          DB = await fullRes.json();
           localStorage.setItem("humomed_full_db", JSON.stringify(DB));
-
-          const labs = liveDB.lab_results || {};
-
-          if (labs[searchCode]) {
-            renderFoundLab(labs[searchCode]);
-            return;
-          }
-
-          const allLabsArray = Array.isArray(labs) ? labs : Object.values(labs);
-          const found = allLabsArray.find(item => 
-            item && item.code && item.code.replace(/\s+/g, '').toUpperCase() === searchCode
-          );
-
-          if (found) {
-            renderFoundLab(found);
-            return;
-          }
+          const labs = DB.lab_results || {};
+          if (labs[searchCode]) return renderFoundLab(labs[searchCode]);
+          const found = Object.values(labs).find(item => item && item.code && item.code.replace(/\s+/g, '').toUpperCase() === searchCode);
+          if (found) return renderFoundLab(found);
         }
-      } catch (e) {
-        console.error("Bazani yuklashda xatolik:", e);
-      }
+      } catch (e) {}
 
-      const localLabs = DB.lab_results || {};
-      if (localLabs[searchCode]) {
-        renderFoundLab(localLabs[searchCode]);
-        return;
-      }
-
-      showInfoModal(
-        "Tahlil Topilmadi 🔍",
-        `<div style="color:#b91c1c; font-weight:700; margin-bottom:8px;">«${searchCode}» raqamli tahlil topilmadi!</div>
-         <p style="font-size:0.85rem; color:#64748b;">
-           Telegram bot orqali kiritilgan kod to‘g‘riligini tekshiring yoki shifokor bilan bog‘laning.
-         </p>`
-      );
+      showInfoModal("Tahlil Topilmadi 🔍", `<div style="color:#b91c1c; font-weight:700; margin-bottom:8px;">«${escapeHTML(searchCode)}» raqamli tahlil topilmadi!</div><p style="font-size:0.85rem; color:#64748b;">Telegram bot orqali kiritilgan kod to‘g‘riligini tekshiring yoki shifokor bilan bog‘laning.</p>`);
     }
 
     function renderFoundLab(data) {
-      let fileBtn = "";
-      if (data.fileUrl) {
-        fileBtn = `
-          <a href="${data.fileUrl}" target="_blank" class="btn-pill btn-pill-cyan" style="display:flex; justify-content:center; align-items:center; width:100%; margin-top:14px; text-decoration:none; padding:10px; border-radius:12px; font-weight:700;">
-            📥 Shifokor Yuklagan Faylni Ochish (PDF/Rasm)
-          </a>
-        `;
-      }
-
+      let fileBtn = data.fileUrl ? `<a href="${escapeHTML(data.fileUrl)}" target="_blank" class="btn-pill btn-pill-cyan" style="display:flex; justify-content:center; width:100%; margin-top:14px; text-decoration:none; padding:10px;">📥 Faylni Ochish (PDF/Rasm)</a>` : "";
       showInfoModal(
-        `Tahlil Natijasi: ${data.code} ✅`,
-        `
-        <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:14px; padding:16px; color:#166534; font-size:0.88rem; line-height: 1.6;">
-          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Bemor:</strong> <span>${data.patient || 'Ko‘rsatilmagan'}</span></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Tahlil turi:</strong> <span>${data.testType || 'Umumiy'}</span></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Shifokor:</strong> <span>${data.doctor || 'Shifokor'}</span></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Sana:</strong> <span>${data.date || 'Bugun'}</span></div>
-          <div style="margin-top:10px; padding-top:8px; border-top:1px dashed #86efac;">
-            <strong>Tibbiy Xulosa:</strong>
-            <p style="margin-top:4px; color:#14532d;">${data.summary || 'Natijalar tayyor.'}</p>
-          </div>
-        </div>
-        ${fileBtn}
-        `
+        `Tahlil Natijasi: ${escapeHTML(data.code)} ✅`,
+        `<div style="background:#f0fdf4; border:1px solid #86efac; border-radius:14px; padding:16px; color:#166534; font-size:0.88rem; line-height: 1.6;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Bemor:</strong> <span>${escapeHTML(data.patient)}</span></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Turi:</strong> <span>${escapeHTML(data.testType)}</span></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Shifokor:</strong> <span>${escapeHTML(data.doctor)}</span></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>Sana:</strong> <span>${escapeHTML(data.date)}</span></div>
+          <div style="margin-top:10px; padding-top:8px; border-top:1px dashed #86efac;"><strong>Tibbiy Xulosa:</strong><p style="margin-top:4px; color:#14532d;">${escapeHTML(data.summary)}</p></div>
+        </div>${fileBtn}`
       );
     }
 
-    // 4. Admin CRUD Amallari
     function openLabModalNew() {
       document.getElementById('editLabId').value = '';
       document.getElementById('labCodeInputModal').value = 'HM-';
@@ -990,104 +721,71 @@
     }
 
     async function saveLabResult() {
-      const code = document.getElementById('labCodeInputModal').value.trim().toUpperCase().replace(/\s+/g, '');
-      const patient = document.getElementById('labPatientModal').value.trim();
-      const testType = document.getElementById('labTypeModal').value.trim();
-      const doctor = document.getElementById('labDoctorModal').value.trim();
-      const summary = document.getElementById('labSummaryModal').value.trim();
-      const fileUrl = document.getElementById('labResultFileUrl').value.trim();
+      const code = escapeHTML(document.getElementById('labCodeInputModal').value.trim().toUpperCase().replace(/\s+/g, ''));
+      const patient = escapeHTML(document.getElementById('labPatientModal').value.trim());
+      const testType = escapeHTML(document.getElementById('labTypeModal').value.trim());
+      const doctor = escapeHTML(document.getElementById('labDoctorModal').value.trim());
+      const summary = escapeHTML(document.getElementById('labSummaryModal').value.trim());
+      const fileUrl = escapeHTML(document.getElementById('labResultFileUrl').value.trim());
 
-      if (!code || !patient || !testType) {
-        alert("Kod, bemor va tahlil turini to'ldiring!");
-        return;
-      }
-
+      if (!code || !patient || !testType) return alert("Kod, bemor va tahlil turini to'ldiring!");
       if (!DB.lab_results || Array.isArray(DB.lab_results)) DB.lab_results = {};
-      DB.lab_results[code] = {
-        id: Date.now(),
-        code, patient, testType, doctor,
-        date: new Date().toISOString().split('T')[0],
-        summary, fileUrl
-      };
-
+      
+      DB.lab_results[code] = { id: Date.now(), code, patient, testType, doctor, date: new Date().toISOString().split('T')[0], summary, fileUrl };
       await syncSectionToServer("lab_results", DB.lab_results);
-      closeModals();
-      alert(`✅ ${code} serverga saqlandi! Barcha qurilmalarda ko'rinadi.`);
+      closeModals(); alert(`✅ ${code} serverga saqlandi!`);
     }
 
     async function deleteLabResult(code) {
       if (confirm(`${code} tahlilini o'chirishni tasdiqlaysizmi?`)) {
-        delete DB.lab_results[code];
-        await syncSectionToServer("lab_results", DB.lab_results);
+        delete DB.lab_results[code]; await syncSectionToServer("lab_results", DB.lab_results);
       }
     }
 
     function openServiceModal() {
       document.getElementById('serviceModalTitle').textContent = "Yangi Xizmat Qo‘shish";
       document.getElementById('editServiceId').value = '';
-      document.getElementById('serviceNameInput').value = '';
-      document.getElementById('serviceDescInput').value = '';
-      document.getElementById('servicePriceInput').value = '';
-      document.getElementById('serviceImageUrl').value = '';
-      updatePreviewSphere('');
-      document.getElementById('serviceEditModal').style.display = 'flex';
+      ['serviceNameInput','serviceDescInput','servicePriceInput','serviceImageUrl'].forEach(id => document.getElementById(id).value = '');
+      updatePreviewSphere(''); document.getElementById('serviceEditModal').style.display = 'flex';
     }
 
     function editService(id) {
-      const s = DB.services.find(x => x.id === id);
-      if (!s) return;
+      const s = DB.services.find(x => x.id === id); if (!s) return;
       document.getElementById('serviceModalTitle').textContent = "Xizmatni Tahrirlash";
       document.getElementById('editServiceId').value = s.id;
       document.getElementById('serviceNameInput').value = s.name;
       document.getElementById('serviceDescInput').value = s.desc;
       document.getElementById('servicePriceInput').value = s.price;
       document.getElementById('serviceImageUrl').value = s.image || '';
-      updatePreviewSphere(s.image || '');
-      document.getElementById('serviceEditModal').style.display = 'flex';
+      updatePreviewSphere(s.image || ''); document.getElementById('serviceEditModal').style.display = 'flex';
     }
 
     async function saveService() {
       const id = document.getElementById('editServiceId').value;
-      const name = document.getElementById('serviceNameInput').value.trim();
-      const desc = document.getElementById('serviceDescInput').value.trim();
-      const price = document.getElementById('servicePriceInput').value.trim();
-      const image = document.getElementById('serviceImageUrl').value.trim();
+      const name = escapeHTML(document.getElementById('serviceNameInput').value.trim());
+      const desc = escapeHTML(document.getElementById('serviceDescInput').value.trim());
+      const price = escapeHTML(document.getElementById('servicePriceInput').value.trim());
+      const image = escapeHTML(document.getElementById('serviceImageUrl').value.trim());
 
-      if (!name || !price) {
-        alert("Nom va narxni kiriting!");
-        return;
-      }
-
-      if (id) {
-        DB.services = DB.services.map(s => s.id == id ? { ...s, name, desc, price, image } : s);
-      } else {
-        DB.services.push({ id: Date.now(), name, desc, price, image });
-      }
-
-      await syncSectionToServer("services", DB.services);
-      closeModals();
-      alert("✅ Xizmat serverga saqlandi va barcha qurilmalarda yangilandi!");
+      if (!name || !price) return alert("Nom va narxni kiriting!");
+      if (id) DB.services = DB.services.map(s => s.id == id ? { ...s, name, desc, price, image } : s);
+      else DB.services.push({ id: Date.now(), name, desc, price, image });
+      await syncSectionToServer("services", DB.services); closeModals(); alert("✅ Xizmat saqlandi!");
     }
 
     async function deleteService(id) {
-      if (confirm("Ushbu xizmatni o‘chirmoqchimisiz?")) {
-        DB.services = DB.services.filter(s => s.id !== id);
-        await syncSectionToServer("services", DB.services);
-      }
+      if (confirm("Ushbu xizmatni o‘chirmoqchimisiz?")) { DB.services = DB.services.filter(s => s.id !== id); await syncSectionToServer("services", DB.services); }
     }
 
     function openDoctorModal() {
       document.getElementById('doctorModalTitle').textContent = "Yangi Shifokor";
       document.getElementById('editDoctorId').value = '';
-      document.getElementById('docNameInput').value = '';
-      document.getElementById('docSpecialtyInput').value = '';
-      document.getElementById('docExpInput').value = '';
+      ['docNameInput','docSpecialtyInput','docExpInput'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('doctorEditModal').style.display = 'flex';
     }
 
     function editDoctor(id) {
-      const d = DB.doctors.find(x => x.id === id);
-      if (!d) return;
+      const d = DB.doctors.find(x => x.id === id); if (!d) return;
       document.getElementById('doctorModalTitle').textContent = "Shifokorni Tahrirlash";
       document.getElementById('editDoctorId').value = d.id;
       document.getElementById('docNameInput').value = d.name;
@@ -1098,147 +796,79 @@
 
     async function saveDoctor() {
       const id = document.getElementById('editDoctorId').value;
-      const name = document.getElementById('docNameInput').value.trim();
-      const specialty = document.getElementById('docSpecialtyInput').value.trim();
-      const exp = document.getElementById('docExpInput').value.trim();
-
-      if (!name || !specialty) {
-        alert("Ism va mutaxassislikni kiriting!");
-        return;
-      }
-
-      if (id) {
-        DB.doctors = DB.doctors.map(d => d.id == id ? { ...d, name, specialty, exp } : d);
-      } else {
-        DB.doctors.push({ id: Date.now(), name, specialty, exp });
-      }
-
-      await syncSectionToServer("doctors", DB.doctors);
-      closeModals();
-      alert("✅ Shifokor ma'lumotlari serverga saqlandi!");
+      const name = escapeHTML(document.getElementById('docNameInput').value.trim());
+      const specialty = escapeHTML(document.getElementById('docSpecialtyInput').value.trim());
+      const exp = escapeHTML(document.getElementById('docExpInput').value.trim());
+      if (!name || !specialty) return alert("Ism va mutaxassislikni kiriting!");
+      if (id) DB.doctors = DB.doctors.map(d => d.id == id ? { ...d, name, specialty, exp } : d);
+      else DB.doctors.push({ id: Date.now(), name, specialty, exp });
+      await syncSectionToServer("doctors", DB.doctors); closeModals(); alert("✅ Shifokor saqlandi!");
     }
 
     async function deleteDoctor(id) {
-      if (confirm("Shifokorni o‘chirmoqchimisiz?")) {
-        DB.doctors = DB.doctors.filter(d => d.id !== id);
-        await syncSectionToServer("doctors", DB.doctors);
-      }
+      if (confirm("Shifokorni o‘chirmoqchimisiz?")) { DB.doctors = DB.doctors.filter(d => d.id !== id); await syncSectionToServer("doctors", DB.doctors); }
     }
 
     async function handleNewBooking() {
-      const name = document.getElementById('patientName').value.trim();
-      const phone = document.getElementById('patientPhone').value.trim();
-      const service = document.getElementById('bookingServiceSelect').value;
-
-      if (!name || !phone) {
-        showInfoModal("Diqqat", "Iltimos, ism va telefoningizni kiriting!");
-        return;
-      }
+      const name = escapeHTML(document.getElementById('patientName').value.trim());
+      const phone = escapeHTML(document.getElementById('patientPhone').value.trim());
+      const service = escapeHTML(document.getElementById('bookingServiceSelect').value);
+      if (!name || !phone) return showInfoModal("Diqqat", "Iltimos, ism va telefoningizni kiriting!");
 
       const dateKey = getDateKey(selectedBookingDate);
       const isBooked = (DB.bookings || []).some(b => b.dateKey === dateKey && b.service === service && b.timeSlot === selectedBookingTime);
-
-      if (isBooked) {
-        showInfoModal("⚠️ Band vaqt", "Ushbu vaqt allaqachon band qilingan!");
-        return;
-      }
+      if (isBooked) return showInfoModal("⚠️ Band vaqt", "Ushbu vaqt allaqachon band qilingan!");
 
       const dateReadable = `${selectedBookingDate.getDate()}-${monthNamesUz[selectedBookingDate.getMonth()]}, ${selectedBookingDate.getFullYear()}`;
-      const newBooking = {
-        id: Date.now(),
-        name, phone, service, dateKey,
-        timeSlot: selectedBookingTime,
-        dateReadable: `${dateReadable} (${selectedBookingTime})`
-      };
-
-      if (!DB.bookings) DB.bookings = [];
-      DB.bookings.unshift(newBooking);
+      const newBooking = { id: Date.now(), name, phone, service, dateKey, timeSlot: selectedBookingTime, dateReadable: `${dateReadable} (${selectedBookingTime})` };
+      
+      if (!DB.bookings) DB.bookings = []; DB.bookings.unshift(newBooking);
       await syncSectionToServer("bookings", DB.bookings);
-
-      showInfoModal("Muvaffaqiyatli! ✅", `Hurmatli ${name}, qabul vaqti umumiy serverda band qilindi: <b>${newBooking.dateReadable}</b>`);
-      document.getElementById('patientName').value = '';
-      document.getElementById('patientPhone').value = '';
+      showInfoModal("Muvaffaqiyatli! ✅", `Hurmatli ${name}, qabul vaqti band qilindi: <b>${newBooking.dateReadable}</b>`);
+      document.getElementById('patientName').value = ''; document.getElementById('patientPhone').value = '';
     }
 
     async function deleteBooking(id) {
-      if (confirm("Navbatni bekor qilmoqchimisiz?")) {
-        DB.bookings = DB.bookings.filter(b => b.id !== id);
-        await syncSectionToServer("bookings", DB.bookings);
-      }
+      if (confirm("Navbatni bekor qilmoqchimisiz?")) { DB.bookings = DB.bookings.filter(b => b.id !== id); await syncSectionToServer("bookings", DB.bookings); }
     }
 
     function renderFrontend() {
       const sContainer = document.getElementById('servicesFrontendList');
       const allServicesFull = document.getElementById('allServicesFullList');
       const createServiceCard = (s) => {
-        const card = document.createElement('div');
-        card.className = 'diag-card-3d';
-        const innerIcon = s.image ? `<img src="${s.image}" alt="${s.name}" />` : `<i data-lucide="scan" style="width:28px; height:28px;"></i>`;
-        card.innerHTML = `<div class="diag-icon-sphere">${innerIcon}</div><h4>${s.name}</h4><p>${s.desc}</p><div class="diag-price-tag">${s.price}</div>`;
-        card.onclick = () => showInfoModal(s.name, `${s.desc}<br/><br/><strong>Narxi:</strong> ${s.price}<br/><br/><button class="btn-pill btn-pill-blue" onclick="closeModals(); scrollToBooking();">Ushbu xizmatga yozilish</button>`);
+        const card = document.createElement('div'); card.className = 'diag-card-3d';
+        const innerIcon = s.image ? `<img src="${escapeHTML(s.image)}" alt="${escapeHTML(s.name)}" />` : `<i data-lucide="scan" style="width:28px; height:28px;"></i>`;
+        card.innerHTML = `<div class="diag-icon-sphere">${innerIcon}</div><h4>${escapeHTML(s.name)}</h4><p>${escapeHTML(s.desc)}</p><div class="diag-price-tag">${escapeHTML(s.price)}</div>`;
+        card.onclick = () => showInfoModal(escapeHTML(s.name), `${escapeHTML(s.desc)}<br/><br/><strong>Narxi:</strong> ${escapeHTML(s.price)}<br/><br/><button class="btn-pill btn-pill-blue" onclick="closeModals(); scrollToBooking();">Ushbu xizmatga yozilish</button>`);
         return card;
       };
-
-      if (sContainer) {
-        sContainer.innerHTML = '';
-        (DB.services || []).forEach(s => sContainer.appendChild(createServiceCard(s)));
-      }
-      if (allServicesFull) {
-        allServicesFull.innerHTML = '';
-        (DB.services || []).forEach(s => allServicesFull.appendChild(createServiceCard(s)));
-      }
+      if (sContainer) { sContainer.innerHTML = ''; (DB.services || []).forEach(s => sContainer.appendChild(createServiceCard(s))); }
+      if (allServicesFull) { allServicesFull.innerHTML = ''; (DB.services || []).forEach(s => allServicesFull.appendChild(createServiceCard(s))); }
 
       const dContainer = document.getElementById('doctorsFrontendList');
       const allDoctorsFull = document.getElementById('allDoctorsFullList');
       const createDoctorCard = (d) => {
-        const item = document.createElement('div');
-        item.className = 'doc-item';
-        item.innerHTML = `<div class="doc-avatar-3d">👨‍⚕️</div><div class="doc-info"><h4>${d.name}</h4><p>${d.specialty}</p></div>`;
-        item.onclick = () => showInfoModal(d.name, `Mutaxassisligi: <strong>${d.specialty}</strong><br/>Tajribasi: <strong>${d.exp}</strong><br/>Qabul: Dush - Shan (09:00 - 18:00)`);
+        const item = document.createElement('div'); item.className = 'doc-item';
+        item.innerHTML = `<div class="doc-avatar-3d">👨‍⚕️</div><div class="doc-info"><h4>${escapeHTML(d.name)}</h4><p>${escapeHTML(d.specialty)}</p></div>`;
+        item.onclick = () => showInfoModal(escapeHTML(d.name), `Mutaxassisligi: <strong>${escapeHTML(d.specialty)}</strong><br/>Tajribasi: <strong>${escapeHTML(d.exp)}</strong><br/>Qabul: Dush - Shan (09:00 - 18:00)`);
         return item;
       };
-
-      if (dContainer) {
-        dContainer.innerHTML = '';
-        (DB.doctors || []).forEach(d => dContainer.appendChild(createDoctorCard(d)));
-      }
-      if (allDoctorsFull) {
-        allDoctorsFull.innerHTML = '';
-        (DB.doctors || []).forEach(d => allDoctorsFull.appendChild(createDoctorCard(d)));
-      }
+      if (dContainer) { dContainer.innerHTML = ''; (DB.doctors || []).forEach(d => dContainer.appendChild(createDoctorCard(d))); }
+      if (allDoctorsFull) { allDoctorsFull.innerHTML = ''; (DB.doctors || []).forEach(d => allDoctorsFull.appendChild(createDoctorCard(d))); }
 
       const select = document.getElementById('bookingServiceSelect');
-      if (select) {
-        select.innerHTML = '';
-        (DB.services || []).forEach(s => {
-          const opt = document.createElement('option');
-          opt.value = s.name;
-          opt.textContent = `${s.name} (${s.price})`;
-          select.appendChild(opt);
-        });
-      }
-
-      lucide.createIcons();
-      updateBookedSlotsUI();
+      if (select) { select.innerHTML = ''; (DB.services || []).forEach(s => { const opt = document.createElement('option'); opt.value = s.name; opt.textContent = `${s.name} (${s.price})`; select.appendChild(opt); }); }
+      lucide.createIcons(); updateBookedSlotsUI();
     }
 
     function renderAdminTables() {
       const labTbody = document.getElementById('adminLabTable');
       if (labTbody) {
         labTbody.innerHTML = '';
-        const rawLabs = DB.lab_results || {};
-        const labs = Array.isArray(rawLabs) ? rawLabs : Object.values(rawLabs);
+        const labs = Array.isArray(DB.lab_results) ? DB.lab_results : Object.values(DB.lab_results || {});
         labs.forEach(l => {
           const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td><strong style="color:var(--primary);">${l.code}</strong></td>
-            <td>${l.patient}</td>
-            <td>${l.testType}</td>
-            <td>${l.doctor}</td>
-            <td>${l.date}</td>
-            <td>${l.fileUrl ? `<a href="${l.fileUrl}" target="_blank">Ochish</a>` : 'Yo‘q'}</td>
-            <td><button class="action-btn btn-delete" onclick="deleteLabResult('${l.code}')">O‘chirish</button></td>
-          `;
+          tr.innerHTML = `<td><strong style="color:var(--primary);">${escapeHTML(l.code)}</strong></td><td>${escapeHTML(l.patient)}</td><td>${escapeHTML(l.testType)}</td><td>${escapeHTML(l.doctor)}</td><td>${escapeHTML(l.date)}</td><td>${l.fileUrl ? `<a href="${escapeHTML(l.fileUrl)}" target="_blank">Ochish</a>` : 'Yo‘q'}</td><td><button class="action-btn btn-delete" onclick="deleteLabResult('${escapeHTML(l.code)}')">O‘chirish</button></td>`;
           labTbody.appendChild(tr);
         });
       }
@@ -1248,8 +878,8 @@
         sTbody.innerHTML = '';
         (DB.services || []).forEach(s => {
           const tr = document.createElement('tr');
-          const img = s.image ? `<img src="${s.image}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" />` : `<div style="width:40px; height:40px; border-radius:50%; background:#e0f2fe; display:flex; align-items:center; justify-content:center;"><i data-lucide="scan" style="width:18px;"></i></div>`;
-          tr.innerHTML = `<td>${img}</td><td><strong>${s.name}</strong></td><td>${s.desc}</td><td><span style="color:var(--primary); font-weight:700;">${s.price}</span></td><td><button class="action-btn btn-edit" onclick="editService(${s.id})">Tahrirlash</button><button class="action-btn btn-delete" onclick="deleteService(${s.id})">O‘chirish</button></td>`;
+          const img = s.image ? `<img src="${escapeHTML(s.image)}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" />` : `<div style="width:40px; height:40px; border-radius:50%; background:#e0f2fe; display:flex; align-items:center; justify-content:center;"><i data-lucide="scan" style="width:18px;"></i></div>`;
+          tr.innerHTML = `<td>${img}</td><td><strong>${escapeHTML(s.name)}</strong></td><td>${escapeHTML(s.desc)}</td><td><span style="color:var(--primary); font-weight:700;">${escapeHTML(s.price)}</span></td><td><button class="action-btn btn-edit" onclick="editService(${s.id})">Tahrirlash</button><button class="action-btn btn-delete" onclick="deleteService(${s.id})">O‘chirish</button></td>`;
           sTbody.appendChild(tr);
         });
       }
@@ -1259,7 +889,7 @@
         dTbody.innerHTML = '';
         (DB.doctors || []).forEach(d => {
           const tr = document.createElement('tr');
-          tr.innerHTML = `<td><strong>${d.name}</strong></td><td>${d.specialty}</td><td>${d.exp}</td><td><button class="action-btn btn-edit" onclick="editDoctor(${d.id})">Tahrirlash</button><button class="action-btn btn-delete" onclick="deleteDoctor(${d.id})">O‘chirish</button></td>`;
+          tr.innerHTML = `<td><strong>${escapeHTML(d.name)}</strong></td><td>${escapeHTML(d.specialty)}</td><td>${escapeHTML(d.exp)}</td><td><button class="action-btn btn-edit" onclick="editDoctor(${d.id})">Tahrirlash</button><button class="action-btn btn-delete" onclick="deleteDoctor(${d.id})">O‘chirish</button></td>`;
           dTbody.appendChild(tr);
         });
       }
@@ -1268,12 +898,11 @@
       if (bTbody) {
         bTbody.innerHTML = '';
         const bks = DB.bookings || [];
-        if (bks.length === 0) {
-          bTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Navbatlar mavjud emas</td></tr>';
-        } else {
+        if (bks.length === 0) bTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Navbatlar mavjud emas</td></tr>';
+        else {
           bks.forEach(b => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td><strong>${b.name}</strong></td><td>${b.phone}</td><td>${b.service}</td><td><span style="background:#e0f2fe; color:#0369a1; padding:4px 8px; border-radius:6px; font-weight:700;">${b.dateReadable}</span></td><td><button class="action-btn btn-delete" onclick="deleteBooking(${b.id})">Bekor qilish</button></td>`;
+            tr.innerHTML = `<td><strong>${escapeHTML(b.name)}</strong></td><td>${escapeHTML(b.phone)}</td><td>${escapeHTML(b.service)}</td><td><span style="background:#e0f2fe; color:#0369a1; padding:4px 8px; border-radius:6px; font-weight:700;">${escapeHTML(b.dateReadable)}</span></td><td><button class="action-btn btn-delete" onclick="deleteBooking(${b.id})">Bekor qilish</button></td>`;
             bTbody.appendChild(tr);
           });
         }
@@ -1281,47 +910,25 @@
       lucide.createIcons();
     }
 
-    let currentCalDate = new Date();
-    let selectedBookingDate = new Date();
-    let selectedBookingTime = '09:00';
+    let currentCalDate = new Date(); let selectedBookingDate = new Date(); let selectedBookingTime = '09:00';
     const monthNamesUz = ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"];
 
     function renderFullCalendar() {
-      const year = currentCalDate.getFullYear();
-      const month = currentCalDate.getMonth();
+      const year = currentCalDate.getFullYear(); const month = currentCalDate.getMonth();
       document.getElementById('calMonthTitle').textContent = `${monthNamesUz[month]} ${year}`;
-      const calGrid = document.getElementById('calendarFullGrid');
-      calGrid.innerHTML = '';
+      const calGrid = document.getElementById('calendarFullGrid'); calGrid.innerHTML = '';
 
-      ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'].forEach(w => {
-        const h = document.createElement('div');
-        h.className = 'cal-weekday';
-        h.textContent = w;
-        calGrid.appendChild(h);
-      });
+      ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'].forEach(w => { const h = document.createElement('div'); h.className = 'cal-weekday'; h.textContent = w; calGrid.appendChild(h); });
 
-      let firstDayIndex = new Date(year, month, 1).getDay();
-      firstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+      let firstDayIndex = new Date(year, month, 1).getDay(); firstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
       const totalDays = new Date(year, month + 1, 0).getDate();
 
-      for (let i = 0; i < firstDayIndex; i++) {
-        const empty = document.createElement('div');
-        empty.className = 'cal-day-cell empty';
-        calGrid.appendChild(empty);
-      }
+      for (let i = 0; i < firstDayIndex; i++) { const empty = document.createElement('div'); empty.className = 'cal-day-cell empty'; calGrid.appendChild(empty); }
 
       for (let day = 1; day <= totalDays; day++) {
-        const cell = document.createElement('div');
-        cell.className = 'cal-day-cell';
-        cell.textContent = day;
-        if (day === selectedBookingDate.getDate() && month === selectedBookingDate.getMonth() && year === selectedBookingDate.getFullYear()) {
-          cell.classList.add('active');
-        }
-        cell.onclick = () => {
-          selectedBookingDate = new Date(year, month, day);
-          renderFullCalendar();
-          updateBookedSlotsUI();
-        };
+        const cell = document.createElement('div'); cell.className = 'cal-day-cell'; cell.textContent = day;
+        if (day === selectedBookingDate.getDate() && month === selectedBookingDate.getMonth() && year === selectedBookingDate.getFullYear()) cell.classList.add('active');
+        cell.onclick = () => { selectedBookingDate = new Date(year, month, day); renderFullCalendar(); updateBookedSlotsUI(); };
         calGrid.appendChild(cell);
       }
     }
@@ -1330,70 +937,47 @@
     function nextMonth() { currentCalDate.setMonth(currentCalDate.getMonth() + 1); renderFullCalendar(); updateBookedSlotsUI(); }
 
     function pickSlotTime(btnEl, timeVal) {
-      if (btnEl.classList.contains('booked')) {
-        showInfoModal("Band!", `Kechirasiz, ${timeVal} allaqachon band qilingan.`);
-        return;
-      }
+      if (btnEl.classList.contains('booked')) return showInfoModal("Band!", `Kechirasiz, ${timeVal} allaqachon band qilingan.`);
       document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active'));
-      btnEl.classList.add('active');
-      selectedBookingTime = timeVal;
-      document.getElementById('customTimeInput').value = '';
+      btnEl.classList.add('active'); selectedBookingTime = timeVal; document.getElementById('customTimeInput').value = '';
     }
 
     function pickCustomTime(val) {
-      if (!val) return;
-      document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active'));
-      selectedBookingTime = val;
+      if (!val) return; document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active')); selectedBookingTime = val;
     }
 
-    function getDateKey(d) {
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    }
+    function getDateKey(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
     function updateBookedSlotsUI() {
-      const curDateKey = getDateKey(selectedBookingDate);
-      const curService = document.getElementById('bookingServiceSelect')?.value;
-      const bookings = DB.bookings || [];
-
-      const bookedTimes = bookings
-        .filter(b => b.dateKey === curDateKey && b.service === curService)
-        .map(b => b.timeSlot);
-
+      const curDateKey = getDateKey(selectedBookingDate); const curService = document.getElementById('bookingServiceSelect')?.value;
+      const bookedTimes = (DB.bookings || []).filter(b => b.dateKey === curDateKey && b.service === curService).map(b => b.timeSlot);
       document.querySelectorAll('.slot-btn').forEach(btn => {
         const slotTime = btn.textContent.trim();
-        if (bookedTimes.includes(slotTime)) {
-          btn.classList.add('booked');
-          if (btn.classList.contains('active')) btn.classList.remove('active');
-        } else {
-          btn.classList.remove('booked');
-        }
+        if (bookedTimes.includes(slotTime)) { btn.classList.add('booked'); if (btn.classList.contains('active')) btn.classList.remove('active'); }
+        else btn.classList.remove('booked');
       });
     }
 
     function updatePreviewSphere(src) {
       const sphere = document.getElementById('imgPreviewSphere');
-      if (src) {
-        sphere.innerHTML = `<img src="${src}" alt="Preview" />`;
-      } else {
-        sphere.innerHTML = `<i data-lucide="scan" style="color:var(--primary); width:28px; height:28px;"></i>`;
-        lucide.createIcons();
-      }
+      sphere.innerHTML = src ? `<img src="${escapeHTML(src)}" alt="Preview" />` : `<i data-lucide="scan" style="color:var(--primary); width:28px; height:28px;"></i>`; lucide.createIcons();
     }
 
     function switchNavView(viewKey) {
       document.querySelectorAll('.view-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-      const target = document.getElementById('view-' + viewKey);
-      if (target) target.classList.add('active');
-      if (event?.currentTarget && event.currentTarget.classList.contains('nav-btn')) {
-        event.currentTarget.classList.add('active');
-      }
+      const target = document.getElementById('view-' + viewKey); if (target) target.classList.add('active');
+      if (event?.currentTarget && event.currentTarget.classList.contains('nav-btn')) event.currentTarget.classList.add('active');
       if (viewKey === 'admin') renderAdminTables();
     }
 
-    function scrollToBooking() {
-      switchNavView('home');
-      document.getElementById('bookingBox')?.scrollIntoView({ behavior: 'smooth' });
+    function scrollToBooking() { switchNavView('home'); document.getElementById('bookingBox')?.scrollIntoView({ behavior: 'smooth' }); }
+
+    // ==========================================
+    // PAROLNI O'ZGARTIRISH VA TIZIMGA KIRISH
+    // ==========================================
+    function getAuthData() {
+      return DB.auth || { user: 'admin', pass: 'humo2026' }; // Baza bo'sh bo'lsa standart parol
     }
 
     function handleAdminClick() {
@@ -1409,84 +993,71 @@
     function verifyAdminLogin() {
       const user = document.getElementById('adminUser').value.trim();
       const pass = document.getElementById('adminPass').value.trim();
-      if (user === 'admin' && pass === 'humo2026') {
+      const auth = getAuthData();
+
+      if (user === auth.user && pass === auth.pass) {
         sessionStorage.setItem('humo_admin_auth', 'true');
-        closeModals();
-        switchNavView('admin');
+        closeModals(); switchNavView('admin');
       } else {
-        alert("Login yoki parol noto‘g‘ri! (admin / humo2026)");
+        alert("❌ Login yoki parol noto‘g‘ri!");
       }
     }
 
-    function adminLogout() {
-      sessionStorage.removeItem('humo_admin_auth');
-      switchNavView('home');
+    async function updateAdminAuth() {
+      const oldPass = document.getElementById('oldAdminPass').value;
+      const newUser = document.getElementById('newAdminLogin').value.trim();
+      const newPass = document.getElementById('newAdminPass').value.trim();
+      const auth = getAuthData();
+
+      if (oldPass !== auth.pass) return alert("❌ Joriy parol noto'g'ri kiritildi!");
+      if (!newUser || !newPass) return alert("⚠️ Yangi login va parolni kiriting!");
+
+      DB.auth = { user: newUser, pass: newPass };
+      await syncSectionToServer("auth", DB.auth);
+      
+      alert("✅ Admin ma'lumotlari muvaffaqiyatli yangilandi! Endi yangi login va parol orqali tizimga kirasiz.");
+      document.getElementById('oldAdminPass').value = '';
+      document.getElementById('newAdminLogin').value = '';
+      document.getElementById('newAdminPass').value = '';
     }
+
+    function adminLogout() { sessionStorage.removeItem('humo_admin_auth'); switchNavView('home'); }
 
     function switchAdminSection(secId) {
       document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(secId).classList.add('active');
-      event.currentTarget.classList.add('active');
+      document.getElementById(secId).classList.add('active'); event.currentTarget.classList.add('active');
     }
 
     function showInfoModal(title, body) {
-      document.getElementById('infoModalTitle').innerHTML = title;
-      document.getElementById('infoModalBody').innerHTML = body;
-      document.getElementById('infoModal').style.display = 'flex';
+      document.getElementById('infoModalTitle').innerHTML = title; document.getElementById('infoModalBody').innerHTML = body; document.getElementById('infoModal').style.display = 'flex';
     }
+    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
 
-    function closeModals() {
-      document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
-    }
-
-    // 7. 3D Background - Tilt effekti o'chirilgan
     const canvas = document.getElementById('bgCanvas');
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.9));
-    const pLight = new THREE.PointLight(0x0284c7, 1.8, 60);
-    pLight.position.set(10, 10, 10);
-    scene.add(pLight);
-
-    const sphereGeom = new THREE.SphereGeometry(0.35, 20, 20);
-    const matCyan = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.2, transparent: true, opacity: 0.7 });
-    const matRed = new THREE.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.3, transparent: true, opacity: 0.85 });
-
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true }); renderer.setSize(window.innerWidth, window.innerHeight);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.9)); const pLight = new THREE.PointLight(0x0284c7, 1.8, 60); pLight.position.set(10, 10, 10); scene.add(pLight);
+    const sphereGeom = new THREE.SphereGeometry(0.35, 20, 20); const matCyan = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.2, transparent: true, opacity: 0.7 }); const matRed = new THREE.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.3, transparent: true, opacity: 0.85 });
     const particles = [];
     for (let i = 0; i < 35; i++) {
-      const mesh = new THREE.Mesh(sphereGeom, Math.random() > 0.65 ? matRed : matCyan);
-      const scale = Math.random() * 1.3 + 0.6;
-      mesh.scale.set(scale, scale, scale);
-      mesh.position.set((Math.random() - 0.5) * 30, (Math.random() - 0.5) * 18, (Math.random() - 0.5) * 14 - 4);
-      mesh.userData = { vx: (Math.random() - 0.5) * 0.012, vy: (Math.random() - 0.5) * 0.012, vz: (Math.random() - 0.5) * 0.012 };
-      scene.add(mesh);
-      particles.push(mesh);
+      const mesh = new THREE.Mesh(sphereGeom, Math.random() > 0.65 ? matRed : matCyan); const scale = Math.random() * 1.3 + 0.6; mesh.scale.set(scale, scale, scale);
+      mesh.position.set((Math.random() - 0.5) * 30, (Math.random() - 0.5) * 18, (Math.random() - 0.5) * 14 - 4); mesh.userData = { vx: (Math.random() - 0.5) * 0.012, vy: (Math.random() - 0.5) * 0.012, vz: (Math.random() - 0.5) * 0.012 }; scene.add(mesh); particles.push(mesh);
     }
     camera.position.z = 12;
 
     function renderLoop() {
       requestAnimationFrame(renderLoop);
       particles.forEach(p => {
-        p.position.x += p.userData.vx;
-        p.position.y += p.userData.vy;
-        p.position.z += p.userData.vz;
-        if (Math.abs(p.position.x) > 16) p.userData.vx *= -1;
-        if (Math.abs(p.position.y) > 11) p.userData.vy *= -1;
-        if (Math.abs(p.position.z) > 10) p.userData.vz *= -1;
+        p.position.x += p.userData.vx; p.position.y += p.userData.vy; p.position.z += p.userData.vz;
+        if (Math.abs(p.position.x) > 16) p.userData.vx *= -1; if (Math.abs(p.position.y) > 11) p.userData.vy *= -1; if (Math.abs(p.position.z) > 10) p.userData.vz *= -1;
       });
       renderer.render(scene, camera);
     }
     renderLoop();
 
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+    window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
 
     renderFullCalendar();
     fetchFullDatabaseFromServer();
