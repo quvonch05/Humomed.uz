@@ -1,4 +1,4 @@
+aiogram
 aiohttp
 aiohttp-cors
-aiogram
-asyncpg
+requests
