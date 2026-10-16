@@ -422,7 +422,7 @@
               </div>
 
               <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px; font-size: 0.72rem; color: #64748b;">
-                <span><span style="display:inline-block; width:8px; height:8px; background:#10b981; border-radius:50%; margin-right:4px;"></span> Server Sinxron: <b>Jonli</b></span>
+                <span><span style="display:inline-block; width:8px; height:8px; background:#10b981; border-radius:50%; margin-right:4px;"></span> Firebase: <b>Ulangan (24/7)</b></span>
                 <span id="syncTimestamp">Hozirgina yangilandi</span>
               </div>
             </div>
@@ -524,8 +524,8 @@
         <div class="admin-dashboard">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
             <div>
-              <h2 style="font-size: 1.5rem; color: #0f172a; font-weight: 800;">Humo Med — Boshqaruv Markazi</h2>
-              <p style="font-size: 0.85rem; color: var(--text-muted);">Markaziy server orqali barcha qurilmalar bilan real-vaqt sinxronizatsiya.</p>
+              <h2 style="font-size: 1.5rem; color: #0f172a; font-weight: 800;">Humo Med — Boshqaruv Markazi (Firebase)</h2>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Google Firebase orqali barcha qurilmalar bilan 24/7 uzluksiz aloqa.</p>
             </div>
             <button class="action-btn btn-delete" style="padding: 8px 16px;" onclick="adminLogout()">
               <i data-lucide="log-out" style="width: 14px;"></i> Chiqish
@@ -544,10 +544,10 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
               <div>
                 <h3 style="font-size: 1.1rem; color: #1e293b;">Online Tahlillar Ro‘yxati</h3>
-                <p style="font-size: 0.8rem; color: #64748b;">Botdan yoki qo'lda qo'shilgan ma'lumotlar umumiy serverda saqlanadi.</p>
+                <p style="font-size: 0.8rem; color: #64748b;">Botdan yoki qo'lda qo'shilgan ma'lumotlar Firebase bulutida saqlanadi.</p>
               </div>
               <div style="display: flex; gap: 8px;">
-                <button class="btn-add" style="background:#059669;" onclick="fetchFullDatabaseFromServer()">🔄 Serverdan Yangilash</button>
+                <button class="btn-add" style="background:#059669;" onclick="fetchFullDatabaseFromServer()">🔄 Bazani Yangilash</button>
                 <button class="btn-add" onclick="openLabModalNew()">+ Qo‘lda Tahlil Qo‘shish</button>
               </div>
             </div>
@@ -608,6 +608,7 @@
     </div>
   </div>
 
+  <!-- MODALLAR -->
   <div class="modal-overlay" id="loginModal">
     <div class="modal-box">
       <button class="modal-close" onclick="closeModals()"><i data-lucide="x" style="width: 16px;"></i></button>
@@ -637,7 +638,7 @@
       <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Mas'ul Shifokor</label><input type="text" id="labDoctorModal" class="admin-input" placeholder="Dr. Jasur Aliyev" /></div>
       <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Tibbiy Xulosa</label><textarea id="labSummaryModal" class="admin-input" style="height: 60px; resize: none;" placeholder="Barcha me'yorlar doirasida..."></textarea></div>
       <div style="margin-bottom: 16px;"><label style="font-size: 0.8rem; font-weight: 700;">Natija Fayli (PDF/Rasm havolasi):</label><input type="text" id="labResultFileUrl" class="admin-input" placeholder="https://... fayl havolasi" /></div>
-      <button class="btn-submit-3d" onclick="saveLabResult()">Serverga Saqlash</button>
+      <button class="btn-submit-3d" onclick="saveLabResult()">Firebase'ga Saqlash</button>
     </div>
   </div>
 
@@ -651,7 +652,7 @@
       <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Xizmat Nomi</label><input type="text" id="serviceNameInput" class="admin-input" placeholder="Masalan: MRT Diagnostika" /></div>
       <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Tavsif</label><input type="text" id="serviceDescInput" class="admin-input" placeholder="Qisqacha tavsif..." /></div>
       <div style="margin-bottom: 16px;"><label style="font-size: 0.8rem; font-weight: 700;">Narxi</label><input type="text" id="servicePriceInput" class="admin-input" placeholder="Masalan: 380,000 so‘m" /></div>
-      <button class="btn-submit-3d" onclick="saveService()">Serverga Saqlash</button>
+      <button class="btn-submit-3d" onclick="saveService()">Firebase'ga Saqlash</button>
     </div>
   </div>
 
@@ -663,7 +664,7 @@
       <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Ism-familiya</label><input type="text" id="docNameInput" class="admin-input" placeholder="Dr. Jasur Aliyev" /></div>
       <div style="margin-bottom: 10px;"><label style="font-size: 0.8rem; font-weight: 700;">Mutaxassislik</label><input type="text" id="docSpecialtyInput" class="admin-input" placeholder="Bosh Kardiolog" /></div>
       <div style="margin-bottom: 16px;"><label style="font-size: 0.8rem; font-weight: 700;">Tajriba</label><input type="text" id="docExpInput" class="admin-input" placeholder="14 yil" /></div>
-      <button class="btn-submit-3d" onclick="saveDoctor()">Serverga Saqlash</button>
+      <button class="btn-submit-3d" onclick="saveDoctor()">Firebase'ga Saqlash</button>
     </div>
   </div>
 
@@ -676,6 +677,7 @@
     </div>
   </div>
 
+  <!-- FIREBASE VA JAVASCRIPT TIZIMI -->
   <script>
     document.addEventListener('contextmenu', event => event.preventDefault()); 
     document.onkeydown = function(e) {
@@ -701,21 +703,70 @@
       });
     }
 
-    const API_BASE_URL = "https://humomed-uz.onrender.com";
-    let DB = { services: [], doctors: [], bookings: [], lab_results: {}, auth: { user: 'admin', pass: 'humo2026' } };
+    // SIZNING FIREBASE MANZILINGIZ
+    const FIREBASE_DB_URL = "https://humomed-a5f76-default-rtdb.firebaseio.com";
 
+    // Boshlang'ich standart ma'lumotlar (Baza bo'sh bo'lganda avtomatik yoziladi)
+    const DEFAULT_DB = {
+      services: [
+        { id: 1, name: "MRT / MSKT", desc: "1.5 Tesla yuqori aniqlikdagi diagnostika", price: "380,000 so‘m", image: "" },
+        { id: 2, name: "Kardiologiya", desc: "EKG, EXO-KG va qon bosimi nazorati", price: "150,000 so‘m", image: "" },
+        { id: 3, name: "Laboratoriya", desc: "150+ turdagi tahlillar tezkor natijasi", price: "80,000 so‘mdan", image: "" }
+      ],
+      doctors: [
+        { id: 1, name: "Dr. Jasur Aliyev", specialty: "Kardiolog (Oliy toifa)", exp: "14 yil" },
+        { id: 2, name: "Dr. Nilufar M.", specialty: "Bosh Nevropatolog", exp: "11 yil" },
+        { id: 3, name: "Dr. Sardor T.", specialty: "Radiolog / MRT", exp: "9 yil" }
+      ],
+      bookings: [],
+      lab_results: {
+        "HM-0077": {
+          id: 1, code: "HM-0077", patient: "Sardor Aliyev", testType: "Umumiy qon tahlili",
+          doctor: "Dr. Jasur Aliyev", date: "2026-10-15", summary: "Barcha ko'rsatkichlar me'yorida. Gemoglobin: 142 g/l.", fileUrl: ""
+        }
+      },
+      auth: { user: 'admin', pass: 'humo2026' }
+    };
+
+    let DB = JSON.parse(JSON.stringify(DEFAULT_DB));
+
+    // Firebase obyektlarini massivga (Array) aylantirish funksiyasi
+    function normalizeArray(val) {
+      if (!val) return [];
+      if (Array.isArray(val)) return val.filter(Boolean);
+      return Object.values(val).filter(Boolean);
+    }
+
+    // 1. Firebase'dan ma'lumotlarni tortish
     async function fetchFullDatabaseFromServer() {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/db?_=${Date.now()}`);
+        const res = await fetch(`${FIREBASE_DB_URL}/.json?_=${Date.now()}`);
         if (res.ok) {
-          DB = await res.json();
+          const data = await res.json();
+          if (!data) {
+            // Agar yangi Firebase bo'sh bo'lsa, standart ma'lumotlarni yozib qo'yamiz
+            await fetch(`${FIREBASE_DB_URL}/.json`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(DEFAULT_DB)
+            });
+            DB = JSON.parse(JSON.stringify(DEFAULT_DB));
+          } else {
+            DB = {
+              services: normalizeArray(data.services),
+              doctors: normalizeArray(data.doctors),
+              bookings: normalizeArray(data.bookings),
+              lab_results: data.lab_results || {},
+              auth: data.auth || { user: 'admin', pass: 'humo2026' }
+            };
+          }
           localStorage.setItem("humomed_full_db", JSON.stringify(DB));
           const ts = new Date().toLocaleTimeString('uz-UZ');
           const syncEl = document.getElementById('syncTimestamp');
           if (syncEl) syncEl.textContent = `Sinxron: ${ts}`;
         }
       } catch (err) {
-        console.warn("Render serveriga ulanish kutilmoqda...", err);
+        console.warn("Firebase ulanishida xatolik, keshdan o'qilmoqda...", err);
         const cached = localStorage.getItem("humomed_full_db");
         if (cached) DB = JSON.parse(cached);
       }
@@ -723,17 +774,21 @@
       renderAdminTables();
     }
 
+    // 2. Firebase'ga ma'lumot saqlash
     async function syncSectionToServer(sectionName, sectionData) {
       try {
-        await fetch(`${API_BASE_URL}/api/update/${sectionName}`, {
-          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(sectionData)
+        await fetch(`${FIREBASE_DB_URL}/${sectionName}.json`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(sectionData)
         });
-        fetchFullDatabaseFromServer();
+        await fetchFullDatabaseFromServer();
       } catch (e) {
-        console.error("Yuborishda xatolik yuz berdi.");
+        alert("⚠️ Firebase bazasiga saqlashda xatolik! Realtime Database 'Rules' qismi ochiqligini tekshiring.");
       }
     }
 
+    // 3. Tahlilni kod bo'yicha qidirish
     async function executeLabCheck(customInputId = null) {
       let inputElem = customInputId ? document.getElementById(customInputId) : (document.getElementById('directLabInput') || document.getElementById('fullViewLabInput'));
       if (!inputElem || !inputElem.value.trim()) {
@@ -741,22 +796,21 @@
         return;
       }
       const searchCode = inputElem.value.trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
-      showInfoModal("Qidirilmoqda 🔍", `<p style="color:#64748b;">Markaziy serverdan <b>${escapeHTML(searchCode)}</b> tahlili yuklanmoqda...</p>`);
+      showInfoModal("Qidirilmoqda 🔍", `<p style="color:#64748b;">Firebase bulutli bazasidan <b>${escapeHTML(searchCode)}</b> tahlili yuklanmoqda...</p>`);
 
       try {
-        const res = await fetch(`${API_BASE_URL}/api/results/${encodeURIComponent(searchCode)}?_=${Date.now()}`);
+        const res = await fetch(`${FIREBASE_DB_URL}/lab_results/${encodeURIComponent(searchCode)}.json?_=${Date.now()}`);
         if (res.ok) {
-          const json = await res.json();
-          if (json && json.data) return renderFoundLab(json.data);
+          const data = await res.json();
+          if (data && data.code) return renderFoundLab(data);
         }
       } catch (err) {}
 
       try {
-        const fullRes = await fetch(`${API_BASE_URL}/api/db?_=${Date.now()}`);
+        const fullRes = await fetch(`${FIREBASE_DB_URL}/lab_results.json?_=${Date.now()}`);
         if (fullRes.ok) {
-          DB = await fullRes.json();
-          localStorage.setItem("humomed_full_db", JSON.stringify(DB));
-          const labs = DB.lab_results || {};
+          const labs = await fullRes.json() || {};
+          DB.lab_results = labs;
           if (labs[searchCode]) return renderFoundLab(labs[searchCode]);
           const found = Object.values(labs).find(item => item && item.code && item.code.replace(/\s+/g, '').toUpperCase() === searchCode);
           if (found) return renderFoundLab(found);
@@ -804,7 +858,7 @@
       
       DB.lab_results[code] = { id: Date.now(), code, patient, testType, doctor, date: new Date().toISOString().split('T')[0], summary, fileUrl };
       await syncSectionToServer("lab_results", DB.lab_results);
-      closeModals(); alert(`✅ ${code} serverga saqlandi!`);
+      closeModals(); alert(`✅ ${code} Firebase'ga saqlandi!`);
     }
 
     async function deleteLabResult(code) {
@@ -938,6 +992,7 @@
         labTbody.innerHTML = '';
         const labs = Array.isArray(DB.lab_results) ? DB.lab_results : Object.values(DB.lab_results || {});
         labs.forEach(l => {
+          if (!l || !l.code) return;
           const tr = document.createElement('tr');
           tr.innerHTML = `<td><strong style="color:var(--primary);">${escapeHTML(l.code)}</strong></td><td>${escapeHTML(l.patient)}</td><td>${escapeHTML(l.testType)}</td><td>${escapeHTML(l.doctor)}</td><td>${escapeHTML(l.date)}</td><td>${l.fileUrl ? `<a href="${escapeHTML(l.fileUrl)}" target="_blank">Ochish</a>` : 'Yo‘q'}</td><td><button class="action-btn btn-delete" onclick="deleteLabResult('${escapeHTML(l.code)}')">O‘chirish</button></td>`;
           labTbody.appendChild(tr);
@@ -1081,7 +1136,7 @@
       DB.auth = { user: newUser, pass: newPass };
       await syncSectionToServer("auth", DB.auth);
       
-      alert("✅ Admin ma'lumotlari muvaffaqiyatli yangilandi! Endi yangi login va parol orqali tizimga kirasiz.");
+      alert("✅ Admin ma'lumotlari Firebase'da yangilandi! Endi yangi login va parol orqali tizimga kirasiz.");
       document.getElementById('oldAdminPass').value = '';
       document.getElementById('newAdminLogin').value = '';
       document.getElementById('newAdminPass').value = '';
