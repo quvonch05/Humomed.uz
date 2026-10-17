@@ -8,7 +8,7 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 
 # --- SOZLAMALAR ---
-BOT_TOKEN = "SIZNING_BOT_TOKENINGIZ_SHU_YERGA_YOZING"
+BOT_TOKEN = "7283268717:AAH6F9JJdwJq54COIRZqraaX-vHR07tehEU"
 FIREBASE_URL = "https://humomed-a5f76-default-rtdb.firebaseio.com"
 
 bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
