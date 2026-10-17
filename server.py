@@ -1,13 +1,14 @@
 import asyncio
 import logging
 import os
-import requests
+import aiohttp
 from datetime import datetime
 from aiohttp import web
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 
 # --- SOZLAMALAR ---
+# Quyidagi qatorga o'zingizning bot tokeningizni qo'ying
 BOT_TOKEN = "7283268717:AAH6F9JJdwJq54COIRZqraaX-vHR07tehEU"
 FIREBASE_URL = "https://humomed-a5f76-default-rtdb.firebaseio.com"
 
@@ -33,8 +34,10 @@ async def cmd_navbatlar(message: types.Message):
     await message.answer("🔄 <i>Firebase bazasidan yangi navbatlar tekshirilmoqda...</i>")
     
     try:
-        response = requests.get(f"{FIREBASE_URL}/bookings.json")
-        bookings = response.json()
+        # requests o'rniga aiohttp asinxron kutubxonasidan foydalanamiz (bot qotib qolmasligi uchun)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{FIREBASE_URL}/bookings.json") as response:
+                bookings = await response.json()
         
         if not bookings:
             await message.answer("✅ Hozircha hech qanday yangi navbat qabul qilinmagan.")
@@ -48,6 +51,13 @@ async def cmd_navbatlar(message: types.Message):
         else:
             bookings_list = list(bookings.values())
 
+        # Eng yangi navbatlar birinchi chiqishi uchun teskari tartiblaymiz
+        bookings_list.sort(key=lambda x: x.get('id', 0), reverse=True)
+
+        if not bookings_list:
+            await message.answer("✅ Hozircha hech qanday yangi navbat qabul qilinmagan.")
+            return
+
         # Ohirgi qo'shilganidan boshlab faqat 15 tasini ko'rsatamiz
         for idx, b in enumerate(bookings_list[:15], start=1):
             text += f"{idx}. <b>Bemor:</b> {b.get('name', 'Noma\'lum')}\n"
@@ -59,7 +69,7 @@ async def cmd_navbatlar(message: types.Message):
         await message.answer(text)
         
     except Exception as e:
-        await message.answer(f"❌ Navbatlarni tortishda xatolik yuz berdi:\n{e}")
+        await message.answer(f"❌ Navbatlarni tortishda xatolik yuz berdi:\n<code>{e}</code>")
 
 @dp.message(F.text.contains("|"))
 async def process_lab_result(message: types.Message):
@@ -83,12 +93,13 @@ async def process_lab_result(message: types.Message):
             "fileUrl": ""
         }
 
-        response = requests.put(f"{FIREBASE_URL}/lab_results/{lab_code}.json", json=data_to_save)
-        
-        if response.status_code == 200:
-            await message.answer(f"✅ <b>Muvaffaqiyatli saqlandi!</b>\n\n🆔 Kod: <b>{lab_code}</b>\nBemor saytdan shu kod orqali natijasini o'qishi mumkin.")
-        else:
-            await message.answer(f"❌ Firebase bazasiga saqlashda xatolik yuz berdi! HTTP {response.status_code}\nRules sozlamalarini tekshiring.")
+        # Tahlil natijalarini ham asinxron tarzda saqlaymiz
+        async with aiohttp.ClientSession() as session:
+            async with session.put(f"{FIREBASE_URL}/lab_results/{lab_code}.json", json=data_to_save) as response:
+                if response.status == 200:
+                    await message.answer(f"✅ <b>Muvaffaqiyatli saqlandi!</b>\n\n🆔 Kod: <b>{lab_code}</b>\nBemor saytdan shu kod orqali natijasini o'qishi mumkin.")
+                else:
+                    await message.answer(f"❌ Firebase bazasiga saqlashda xatolik yuz berdi! HTTP {response.status}\nRules sozlamalarini tekshiring.")
 
     except Exception as e:
         await message.answer(f"⚠️ Xatolik yuz berdi: {e}")
@@ -119,3 +130,4 @@ async def start_server():
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     asyncio.run(start_server())
+        
