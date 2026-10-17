@@ -291,8 +291,8 @@
 
               <select id="bookingServiceSelect" class="booking-input" style="margin-bottom: 10px;" onchange="updateBookedSlotsUI()"></select>
               
-              <!-- Yangi qo'shilgan: Shifokor tanlash -->
-              <select id="bookingDoctorSelect" class="booking-input" style="margin-bottom: 10px;">
+              <!-- Shifokor tanlash maydoni -->
+              <select id="bookingDoctorSelect" class="booking-input" style="margin-bottom: 10px;" onchange="updateBookedSlotsUI()">
                 <option value="">Shifokorni tanlang (ixtiyoriy)</option>
               </select>
 
@@ -661,7 +661,6 @@
     }
 
     async function saveLabResult() {
-      // XATOLIKNI TARTIBGA SOLISH: escapeHTML O'CHIRILDI
       const code = document.getElementById('labCodeInputModal').value.trim().toUpperCase().replace(/\s+/g, '');
       const patient = document.getElementById('labPatientModal').value.trim();
       const testType = document.getElementById('labTypeModal').value.trim();
@@ -699,7 +698,6 @@
     }
 
     async function saveService() {
-      // XATOLIKNI TARTIBGA SOLISH: escapeHTML O'CHIRILDI
       const id = document.getElementById('editServiceId').value;
       const name = document.getElementById('serviceNameInput').value.trim();
       const desc = document.getElementById('serviceDescInput').value.trim();
@@ -732,7 +730,6 @@
     }
 
     async function saveDoctor() {
-      // XATOLIKNI TARTIBGA SOLISH: escapeHTML O'CHIRILDI
       const id = document.getElementById('editDoctorId').value;
       const name = document.getElementById('docNameInput').value.trim();
       const specialty = document.getElementById('docSpecialtyInput').value.trim();
@@ -747,11 +744,10 @@
     async function deleteDoctor(id) { if (confirm("Shifokorni o‘chirmoqchimisiz?")) { DB.doctors = DB.doctors.filter(d => d.id !== id); await syncSectionToServer("doctors", DB.doctors); } }
 
     async function handleNewBooking() {
-      // XATOLIKNI TARTIBGA SOLISH: escapeHTML O'CHIRILDI
       const name = document.getElementById('patientName').value.trim();
       const phone = document.getElementById('patientPhone').value.trim();
       const service = document.getElementById('bookingServiceSelect').value;
-      const doctor = document.getElementById('bookingDoctorSelect').value || "Umumiy qabul"; // YANGI QISMI
+      const doctor = document.getElementById('bookingDoctorSelect').value || "Umumiy qabul";
       
       if (!name || !phone) return showInfoModal("Diqqat", "Iltimos, ism va telefoningizni kiriting!");
 
@@ -761,18 +757,26 @@
 
       const dateReadable = `${selectedBookingDate.getDate()}-${monthNamesUz[selectedBookingDate.getMonth()]}, ${selectedBookingDate.getFullYear()}`;
       
-      // Yangi qismi: doctor parametrini ham qo'shdik
       const newBooking = { id: Date.now(), name, phone, service, doctor, dateKey, timeSlot: selectedBookingTime, dateReadable: `${dateReadable} (${selectedBookingTime})` };
       
       if (!DB.bookings) DB.bookings = []; DB.bookings.unshift(newBooking);
       await syncSectionToServer("bookings", DB.bookings);
       
-      // Tasdiq oynasi
       showInfoModal("Muvaffaqiyatli! ✅", `Hurmatli <b>${escapeHTML(name)}</b>, qabul vaqti band qilindi:<br><br>Sana: <b>${newBooking.dateReadable}</b><br>Shifokor: <b>${escapeHTML(doctor)}</b>`);
       document.getElementById('patientName').value = ''; document.getElementById('patientPhone').value = '';
     }
 
     async function deleteBooking(id) { if (confirm("Navbatni bekor qilmoqchimisiz?")) { DB.bookings = DB.bookings.filter(b => b.id !== id); await syncSectionToServer("bookings", DB.bookings); } }
+
+    function scrollToBookingWithDoctor(docName) {
+      switchNavView('home');
+      const docSelect = document.getElementById('bookingDoctorSelect');
+      if (docSelect) {
+        docSelect.value = docName;
+        updateBookedSlotsUI();
+      }
+      document.getElementById('bookingBox')?.scrollIntoView({ behavior: 'smooth' });
+    }
 
     function renderFrontend() {
       const sContainer = document.getElementById('servicesFrontendList'); const allServicesFull = document.getElementById('allServicesFullList');
@@ -790,7 +794,10 @@
       const createDoctorCard = (d) => {
         const item = document.createElement('div'); item.className = 'doc-item';
         item.innerHTML = `<div class="doc-avatar-3d">👨‍⚕️</div><div class="doc-info"><h4>${escapeHTML(d.name)}</h4><p>${escapeHTML(d.specialty)}</p></div>`;
-        item.onclick = () => showInfoModal(escapeHTML(d.name), `Mutaxassisligi: <strong>${escapeHTML(d.specialty)}</strong><br/>Tajribasi: <strong>${escapeHTML(d.exp)}</strong><br/>Qabul: Dush - Shan (09:00 - 18:00)`);
+        item.onclick = () => showInfoModal(
+          escapeHTML(d.name), 
+          `Mutaxassisligi: <strong>${escapeHTML(d.specialty)}</strong><br/>Tajribasi: <strong>${escapeHTML(d.exp)}</strong><br/>Qabul: Dush - Shan (09:00 - 18:00)<br/><br/><button class="btn-pill btn-pill-blue" style="width: 100%; padding: 12px; margin-top: 10px;" onclick="closeModals(); scrollToBookingWithDoctor('${escapeHTML(d.name)}');">To'g'ridan-to'g'ri qabulga yozilish</button>`
+        );
         return item;
       };
       if (dContainer) { dContainer.innerHTML = ''; (DB.doctors || []).forEach(d => dContainer.appendChild(createDoctorCard(d))); }
@@ -799,7 +806,6 @@
       const select = document.getElementById('bookingServiceSelect');
       if (select) { select.innerHTML = ''; (DB.services || []).forEach(s => { const opt = document.createElement('option'); opt.value = s.name; opt.textContent = `${s.name} (${s.price})`; select.appendChild(opt); }); }
       
-      // Shifokorlar ro'yxatini to'ldirish
       const docSelect = document.getElementById('bookingDoctorSelect');
       if (docSelect) {
         docSelect.innerHTML = '<option value="">Shifokorni tanlang (ixtiyoriy)</option>';
