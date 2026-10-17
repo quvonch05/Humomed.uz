@@ -1,136 +1,121 @@
-import os
 import asyncio
-import re
+import logging
+import os
+import requests
 from datetime import datetime
-from aiohttp import web, ClientSession
-import aiohttp_cors
-from aiogram import Bot, Dispatcher, F, types
+from aiohttp import web
+from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 
-# Sozlamalar
-BOT_TOKEN = "7283268717:AAH6F9JJdwJq54COIRZqraaX-vHR07tehEU"
+# --- SOZLAMALAR ---
+BOT_TOKEN = "SIZNING_BOT_TOKENINGIZ_SHU_YERGA_YOZING"
 FIREBASE_URL = "https://humomed-a5f76-default-rtdb.firebaseio.com"
 
-bot = Bot(token=BOT_TOKEN) if BOT_TOKEN else None
+bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
 dp = Dispatcher()
 
-# ================= FIREBASE'GA SAQLASH FUNKSIYASI =================
-async def save_lab_to_firebase(code: str, payload: dict) -> bool:
-    url = f"{FIREBASE_URL}/lab_results/{code}.json"
-    try:
-        async with ClientSession() as session:
-            async with session.put(url, json=payload) as resp:
-                return resp.status == 200
-    except Exception as e:
-        print(f"⚠️ Firebase'ga yuborishda xatolik: {e}")
-        return False
+# --- BUYRUQLAR ---
 
-# ================= TELEGRAM BOT =================
 @dp.message(Command("start"))
-async def start_handler(message: types.Message):
-    await message.answer(
-        "👨‍⚕️ <b>Humo Med — Shifokorlar Tizimi (Firebase 24/7)</b>\n\n"
+async def cmd_start(message: types.Message):
+    text = (
+        "🏥 <b>Humo Med — Shifokorlar Tizimi (Firebase 24/7)</b>\n\n"
         "Bemor tahlil natijasini saytga chiqarish uchun quyidagi formatda yuboring:\n"
         "<code>KOD | Bemor Ismi | Tahlil Turi | Vrach Ismi | Xulosa</code>\n\n"
         "<i>Misol:</i>\n"
-        "<code>HM-0077 | Sardor Aliyev | Biokimyo | Dr. Jasur | Natijalar me'yorda</code>",
-        parse_mode="HTML"
+        "<code>HM-0077 | Sardor Aliyev | Biokimyo | Dr. Jasur | Natijalar me'yorda</code>\n\n"
+        "📋 Qabulga yozilgan yangi bemorlar navbatini ko'rish uchun /navbatlar ni bosing."
     )
+    await message.answer(text)
 
-@dp.message(F.text)
-async def handle_text_lab(message: types.Message):
-    await parse_and_store(message.text, message)
-
-@dp.message(F.document | F.photo)
-async def handle_file_lab(message: types.Message):
-    caption = message.caption
-    if not caption:
-        await message.reply(
-            "⚠️ Fayl izohiga (caption) ma'lumotlarni yozing!\n"
-            "Format: <code>HM-0077 | Ism | Tahlil | Vrach | Xulosa</code>",
-            parse_mode="HTML"
-        )
-        return
-    file_id = message.document.file_id if message.document else message.photo[-1].file_id
-    file_info = await bot.get_file(file_id)
-    file_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_info.file_path}"
-    await parse_and_store(caption, message, file_url=file_url)
-
-async def parse_and_store(raw_text: str, message: types.Message, file_url=""):
-    clean_text = re.sub(r'<[^>]*>', '', raw_text).strip()
-    if "|" not in clean_text:
-        await message.reply("⚠️ Format noto‘g‘ri! Elementlarni | bilan ajrating.")
-        return
+@dp.message(Command("navbatlar"))
+async def cmd_navbatlar(message: types.Message):
+    await message.answer("🔄 <i>Firebase bazasidan yangi navbatlar tekshirilmoqda...</i>")
     
-    parts = [p.strip() for p in clean_text.split("|")]
-    code = parts[0].replace(" ", "").upper()
-    patient = parts[1] if len(parts) > 1 else "Bemor"
-    test_type = parts[2] if len(parts) > 2 else "Umumiy tahlil"
-    doctor = parts[3] if len(parts) > 3 else "Humo Med Shifokori"
-    summary = parts[4] if len(parts) > 4 else "Tahlil natijalari tayyor."
+    try:
+        response = requests.get(f"{FIREBASE_URL}/bookings.json")
+        bookings = response.json()
+        
+        if not bookings:
+            await message.answer("✅ Hozircha hech qanday yangi navbat qabul qilinmagan.")
+            return
 
-    lab_entry = {
-        "id": int(datetime.now().timestamp() * 1000),
-        "code": code,
-        "patient": patient,
-        "testType": test_type,
-        "doctor": doctor,
-        "date": datetime.now().strftime("%Y-%m-%d"),
-        "summary": summary,
-        "fileUrl": file_url
-    }
+        text = "🗓 <b>Bemorlar navbati (Saytdan yozilganlar):</b>\n\n"
+        
+        # Ro'yxat (list) yoki Lug'at (dict) ekanligini ajratib olamiz
+        if isinstance(bookings, list):
+            bookings_list = [b for b in bookings if b is not None]
+        else:
+            bookings_list = list(bookings.values())
 
-    success = await save_lab_to_firebase(code, lab_entry)
-    if success:
-        await message.reply(
-            f"✅ <b>Muvaffaqiyatli saqlandi!</b>\n"
-            f"🔑 Kod: <code>{code}</code>\n"
-            f"👤 Bemor: {patient}\n"
-            f"☁️ Baza: <b>Google Firebase (24/7)</b>",
-            parse_mode="HTML"
-        )
-    else:
-        await message.reply("❌ Firebase bazasiga saqlashda xatolik yuz berdi! Rules sozlamalarini tekshiring.")
+        # Ohirgi qo'shilganidan boshlab faqat 15 tasini ko'rsatamiz
+        for idx, b in enumerate(bookings_list[:15], start=1):
+            text += f"{idx}. <b>Bemor:</b> {b.get('name', 'Noma\'lum')}\n"
+            text += f"📞 <b>Tel:</b> {b.get('phone', '-')}\n"
+            text += f"🩺 <b>Xizmat:</b> {b.get('service', '-')} | <b>Shifokor:</b> {b.get('doctor', 'Umumiy qabul')}\n"
+            text += f"⏰ <b>Vaqt:</b> {b.get('dateReadable', '-')}\n"
+            text += f"—————————————\n"
 
-# ================= RENDER VA UPTIMEROBOT UCHUN HEALTH CHECK =================
-CACHE_HEADERS = {
-    "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
-    "Pragma": "no-cache",
-    "Expires": "0"
-}
+        await message.answer(text)
+        
+    except Exception as e:
+        await message.answer(f"❌ Navbatlarni tortishda xatolik yuz berdi:\n{e}")
 
-async def api_health(request):
-    return web.Response(text="Humo Med Bot & Firebase Live OK!", headers=CACHE_HEADERS)
+@dp.message(F.text.contains("|"))
+async def process_lab_result(message: types.Message):
+    try:
+        parts = [p.strip() for p in message.text.split("|")]
+        if len(parts) != 5:
+            await message.answer("⚠️ Format noto'g'ri. 5 ta qism bo'lishi kerak:\n<code>KOD | Ism | Turi | Vrach | Xulosa</code>")
+            return
 
-# ================= SERVER VA BOTNI ISHGA TUSHIRISH =================
+        lab_code, patient, test_type, doctor, summary = parts
+        lab_code = lab_code.upper().replace(" ", "")
+
+        data_to_save = {
+            "id": int(datetime.now().timestamp()),
+            "code": lab_code,
+            "patient": patient,
+            "testType": test_type,
+            "doctor": doctor,
+            "date": datetime.now().strftime("%Y-%m-%d"),
+            "summary": summary,
+            "fileUrl": ""
+        }
+
+        response = requests.put(f"{FIREBASE_URL}/lab_results/{lab_code}.json", json=data_to_save)
+        
+        if response.status_code == 200:
+            await message.answer(f"✅ <b>Muvaffaqiyatli saqlandi!</b>\n\n🆔 Kod: <b>{lab_code}</b>\nBemor saytdan shu kod orqali natijasini o'qishi mumkin.")
+        else:
+            await message.answer(f"❌ Firebase bazasiga saqlashda xatolik yuz berdi! HTTP {response.status_code}\nRules sozlamalarini tekshiring.")
+
+    except Exception as e:
+        await message.answer(f"⚠️ Xatolik yuz berdi: {e}")
+
+# --- RAILWAY UCHUN SERVER SOZLAMALARI ---
+async def handle_ping(request):
+    return web.Response(text="Humo Med Bot va Server 24/7 ishlamoqda!")
+
 async def start_server():
     app = web.Application()
-    cors = aiohttp_cors.setup(app, defaults={
-        "*": aiohttp_cors.ResourceOptions(
-            allow_credentials=True, 
-            expose_headers="*", 
-            allow_headers="*"
-        )
-    })
-
-    cors.add(app.router.add_get('/', api_health))
-
+    app.router.add_get('/', handle_ping)
+    
     runner = web.AppRunner(app)
     await runner.setup()
-
+    
+    # Railway beradigan port yoki standart 10000 port
     port = int(os.environ.get("PORT", 10000))
-    site = web.TCPSite(runner, "0.0.0.0", port)
+    site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
+    
     print(f"🚀 Server 0.0.0.0:{port} portida ishlamoqda")
-
-    if bot:
-        # Eski qotib qolgan webhook va sessiyalarni tozalash
-        await bot.delete_webhook(drop_pending_updates=True)
-        asyncio.create_task(dp.start_polling(bot))
-        print("🤖 Telegram-bot muvaffaqiyatli ishga tushdi!")
-
-    while True:
-        await asyncio.sleep(3600)
+    
+    # Botni webhookdan tozalab, polling usulida ishga tushirish
+    await bot.delete_webhook(drop_pending_updates=True)
+    print("🤖 Telegram-bot muvaffaqiyatli ishga tushdi!")
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     asyncio.run(start_server())
