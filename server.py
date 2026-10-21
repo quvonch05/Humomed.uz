@@ -8,7 +8,6 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 
 # --- SOZLAMALAR ---
-# Quyidagi qatorga o'zingizning bot tokeningizni qo'ying
 BOT_TOKEN = "8943117196:AAFBq8kqtYCWR8D6XlCHzNQigrv0nPhgxkg"
 FIREBASE_URL = "https://humomed-51f21-default-rtdb.firebaseio.com"
 
@@ -34,7 +33,6 @@ async def cmd_navbatlar(message: types.Message):
     await message.answer("🔄 <i>Firebase bazasidan yangi navbatlar tekshirilmoqda...</i>")
     
     try:
-        # requests o'rniga aiohttp asinxron kutubxonasidan foydalanamiz (bot qotib qolmasligi uchun)
         async with aiohttp.ClientSession() as session:
             async with session.get(f"{FIREBASE_URL}/bookings.json") as response:
                 bookings = await response.json()
@@ -45,20 +43,17 @@ async def cmd_navbatlar(message: types.Message):
 
         text = "🗓 <b>Bemorlar navbati (Saytdan yozilganlar):</b>\n\n"
         
-        # Ro'yxat (list) yoki Lug'at (dict) ekanligini ajratib olamiz
         if isinstance(bookings, list):
             bookings_list = [b for b in bookings if b is not None]
         else:
             bookings_list = list(bookings.values())
 
-        # Eng yangi navbatlar birinchi chiqishi uchun teskari tartiblaymiz
         bookings_list.sort(key=lambda x: x.get('id', 0), reverse=True)
 
         if not bookings_list:
             await message.answer("✅ Hozircha hech qanday yangi navbat qabul qilinmagan.")
             return
 
-        # Ohirgi qo'shilganidan boshlab faqat 15 tasini ko'rsatamiz
         for idx, b in enumerate(bookings_list[:15], start=1):
             text += f"{idx}. <b>Bemor:</b> {b.get('name', 'Noma\'lum')}\n"
             text += f"📞 <b>Tel:</b> {b.get('phone', '-')}\n"
@@ -93,7 +88,6 @@ async def process_lab_result(message: types.Message):
             "fileUrl": ""
         }
 
-        # Tahlil natijalarini ham asinxron tarzda saqlaymiz
         async with aiohttp.ClientSession() as session:
             async with session.put(f"{FIREBASE_URL}/lab_results/{lab_code}.json", json=data_to_save) as response:
                 if response.status == 200:
@@ -104,7 +98,6 @@ async def process_lab_result(message: types.Message):
     except Exception as e:
         await message.answer(f"⚠️ Xatolik yuz berdi: {e}")
 
-# --- RAILWAY UCHUN SERVER SOZLAMALARI ---
 async def handle_ping(request):
     return web.Response(text="Humo Med Bot va Server 24/7 ishlamoqda!")
 
@@ -115,14 +108,12 @@ async def start_server():
     runner = web.AppRunner(app)
     await runner.setup()
     
-    # Railway beradigan port yoki standart 10000 port
     port = int(os.environ.get("PORT", 10000))
     site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
     
     print(f"🚀 Server 0.0.0.0:{port} portida ishlamoqda")
     
-    # Botni webhookdan tozalab, polling usulida ishga tushirish
     await bot.delete_webhook(drop_pending_updates=True)
     print("🤖 Telegram-bot muvaffaqiyatli ishga tushdi!")
     await dp.start_polling(bot)
@@ -130,4 +121,3 @@ async def start_server():
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     asyncio.run(start_server())
-        
