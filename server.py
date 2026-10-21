@@ -10,7 +10,7 @@ from aiogram.filters import Command
 # --- SOZLAMALAR ---
 # Quyidagi qatorga o'zingizning bot tokeningizni qo'ying
 BOT_TOKEN = "7283268717:AAH6F9JJdwJq54COIRZqraaX-vHR07tehEU"
-FIREBASE_URL = "https://humomed-a5f76-default-rtdb.firebaseio.com"
+FIREBASE_URL = "https://humomed-51f21-default-rtdb.firebaseio.com"
 
 bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
 dp = Dispatcher()
