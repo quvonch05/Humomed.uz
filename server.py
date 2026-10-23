@@ -55,7 +55,7 @@ async def cmd_navbatlar(message: types.Message):
             return
 
         for idx, b in enumerate(bookings_list[:15], start=1):
-            text += f"{idx}. <b>Bemor:</b> {b.get('name', 'Noma\'lum')}\n"
+            text += f"{idx}. <b>Bemor:</b> {b.get('name', \"Noma'lum\")}\n"
             text += f"📞 <b>Tel:</b> {b.get('phone', '-')}\n"
             text += f"🩺 <b>Xizmat:</b> {b.get('service', '-')} | <b>Shifokor:</b> {b.get('doctor', 'Umumiy qabul')}\n"
             text += f"⏰ <b>Vaqt:</b> {b.get('dateReadable', '-')}\n"
